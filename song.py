@@ -14,5 +14,8 @@ class song:
     def get_lyrics(self):
         return self.__lyrics
 
+    def get__duration(self):
+        return self.__duration
+
     def get_author(self):
         return self.__author
