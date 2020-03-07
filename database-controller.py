@@ -1,6 +1,5 @@
 import importlib
 
-db = importlib.import_module('database')
 
 class Database_Controller:
     #create, retrieve, update, delete
@@ -14,6 +13,15 @@ class Database_Controller:
     @property
     def addSong(self):
         return self.__create_method
+
+    @property
+    def getSong(self):
+        return self.__retreive_method
+
+
+# db = importlib.import_module('sql-database/sqlite3-controller', package=None)
+
+#sqlite3 = Database_Controller("sqlite3", db.insert_song_into_songs, db.select_songs, "", "")
 
 # database = db.Database()
 # mock_database = Database_Controller("mock_database", database.getSongs, database.addSong, "", "")
