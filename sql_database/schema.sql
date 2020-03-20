@@ -13,7 +13,7 @@ CREATE TABLE users (
 );
 
 CREATE TABLE songs (
-    _id         INTEGER PRIMARY KEY AUTOINCREMENT,
+    _id         INTEGER PRIMARY KEY AUTOINCREMENT, --replace with unique song tag ISRC so we don't need to worry about duplication**
     title       TEXT NOT NULL,
     artist      TEXT NOT NULL,
     duration    REAL NOT NULL,

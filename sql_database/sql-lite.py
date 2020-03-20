@@ -37,7 +37,7 @@ def close_connection(exception):
         db.close()
 
 
-init_db()
+init_db() #imports schema.sql
 
 #select query
 # for user in query_db('select * from users'):
