@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Music Player</title>
+		<link
+			rel="stylesheet"
+			href="{{ url_for('static',filename='css/mp.css') }}"
+		/>
+	</head>
+	<body>
+		<header class="header_grid">
+			<div class="item1">
+				<audio controls class="music_player">
+					<source src="#" type="audio/ogg" />
+					<source src="#" type="audio/mpeg" />
+					Your browser does not support the audio element.
+				</audio>
+			</div>
+			<div></div>
+			<div></div>
+		</header>
+		<main>
+			<section class="control_grid"></section>
+			<section class="music_grid"></section>
+		</main>
+		<footer></footer>
+	</body>
+</html>

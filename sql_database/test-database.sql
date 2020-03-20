@@ -1,9 +1,10 @@
-DROP TABLE IF EXISTS playlists;
+DROP TABLE IF EXISTS playlist_songs;
+DROP TABLE IF EXISTS playlist;
 DROP TABLE IF EXISTS lyrics;
-DROP TABLE IF EXISTS songs;
-DROP TABLE IF EXISTS users;
+DROP TABLE IF EXISTS song;
+DROP TABLE IF EXISTS user;
 
-CREATE TABLE users (
+CREATE TABLE user (
     _id           INTEGER PRIMARY KEY,
     `name`        TEXT NOT NULL,
     email         TEXT NOT NULL,
@@ -11,7 +12,7 @@ CREATE TABLE users (
     `password`    TEXT NOT NULL
 );
 
-CREATE TABLE songs (
+CREATE TABLE song (
     _id         INTEGER PRIMARY KEY,
     title       TEXT NOT NULL,
     artist      TEXT NOT NULL,
@@ -24,13 +25,21 @@ CREATE TABLE lyrics (
     _id         INTEGER PRIMARY KEY,
     song_id     INTEGER,
     `language`    TEXT NOT NULL,
-    FOREIGN KEY (song_id) REFERENCES songs (id)
+    FOREIGN KEY (song_id) REFERENCES song(id)
 );
 
-CREATE TABLE playlists (
+CREATE TABLE playlist (
     _id         INTEGER PRIMARY KEY,
     user_id     INTEGER,
+    title       TEXT NOT NULL,
     song_id     INTEGER,
-    FOREIGN KEY (user_id) REFERENCES users (id),
-    FOREIGN KEY (song_id) REFERENCES songs (id)
+    FOREIGN KEY (user_id) REFERENCES user(id),
+);
+
+CREATE TABLE playlist_songs (
+    playlist_id INTEGER,
+    song_id     INTEGER,
+    FOREIGN KEY (playlist_id) REFERENCES playlist(id),
+    FOREIGN KEY (song_id) REFERENCES song(id)
+
 );

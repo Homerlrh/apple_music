@@ -1,23 +1,57 @@
+from flask import Flask, render_template, request, jsonify
 
-import importlib
-db_controller = importlib.import_module('database-controller')
-#db = importlib.import_module('sql-database/sqlite3-controller', package=None)
+from flask_sqlalchemy import SQLAlchemy
 
-import sys
-sys.path.insert(0, '/sql-database/sqlite3_controller')
+app = Flask(__name__)
 
-from sql_database.sqlite3_controller import *
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///db.sqlite'
 
-app = importlib.import_module('platform-engine')
+db = SQLAlchemy(app)
 
 
-#initialize sqlite3
-sqlite3_database = db_controller.Database_Controller("sqlite3", insert_song_into_songs, select_songs, "", "")
-#bind sqlite3_database's create song method to addSong on Platform_Engine
-music_platform = app.Platform_Engine(sqlite3_database)
+class User(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(80), unique=True, nullable=False)
+    email = db.Column(db.String(120), unique=True, nullable=False)
 
-#title, artist, duration, release_year
-#music_platform.addSong("Let Me Know", "Perfume", 4.5, 2017)
+    def __repr__(self):
+        return '<User %r>' % self.username
 
-print(music_platform.getAllSongs())
 
+db.create_all()
+
+admin = User(username='admin', email='admin@example.com')
+guest = User(username='guest', email='guest@example.com')
+
+
+@app.route("/")
+def home():
+    db.session.add(admin)
+    db.session.add(guest)
+    db.session.commit()
+    return render_template("index.html")
+
+
+@app.route("/login")
+def login():
+    # User.query.all()
+    # name = User.query.filter_by(username='admin').first()
+    # print(name)
+    # return render_template("login.html", user=name)
+    return render_template("index.html")
+
+
+@app.route("/m", methods=["post"])
+def sent():
+    print("hello")
+    data = request.form
+    return data
+
+
+@app.route("/mp", methods=["get"])
+def play_music():
+    return render_template("player.html")
+
+
+if __name__ == "__main__":
+    app.run(debug=True)
