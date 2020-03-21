@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Music Player</title>
+		<link
+			rel="stylesheet"
+			href="{{ url_for('static',filename='css/mp.css') }}"
+		/>
+		<link
+			rel="stylesheet"
+			href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+			integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
+			crossorigin="anonymous"
+		/>
+	</head>
+	<body>
+		<header class="header_grid">
+			<div class="item1">
+				<audio controls class="music_player">
+					<!-- <source src="#" type="audio/ogg" />-->
+					<source
+						src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"
+						type="audio/mpeg"
+					/>
+					Your browser does not support the audio element.
+				</audio>
+			</div>
+			<div></div>
+			<div></div>
+		</header>
+		<main>
+			<section class="control_grid">
+				<div>
+					{% include './partial/model.html' %}
+				</div>
+				<div class="d-flex justify-content-center">
+					<div class="btn-group btn-group-toggle" data-toggle="buttons">
+						<label class="btn btn-secondary">
+							<input
+								type="radio"
+								name="options"
+								id="option1"
+								autocomplete="off"
+							/>
+							song
+						</label>
+						<label class="btn btn-secondary">
+							<input
+								type="radio"
+								name="options"
+								id="option2"
+								autocomplete="off"
+							/>
+							Albums
+						</label>
+					</div>
+				</div>
+				<div></div>
+			</section>
+
+			<section class="music_container">
+				{% if detail%}
+				<form id="update_form" style="margin-top: 10px;">
+					<input name="id" value="{{detail.id}}" type="hidden" />
+					<div class="form-group">
+						<label for="{{detail.name}}">Name</label>
+						<input
+							type="text"
+							class="form-control"
+							name="name"
+							id="{{detail.name}}"
+							value="{{detail.name}}"
+						/>
+					</div>
+					<div class="form-group">
+						<label for="{{detail.author}}">Artists</label>
+						<input
+							type="text"
+							class="form-control"
+							name="author"
+							id="{{detail.author}}"
+							value="{{detail.author}}"
+						/>
+					</div>
+					<div class="form-group">
+						<label for="{{detail.album}}">Album</label>
+						<input
+							type="text"
+							name="Album"
+							class="form-control"
+							id="{{detail.album}}"
+							value="{{detail.album}}"
+						/>
+					</div>
+					<div class="form-group">
+						<label for="{{detail.lyrics}}">Lyrics</label>
+						<textarea
+							class="form-control"
+							name="lyrics"
+							id="{{detail.lyrics}}"
+							rows="3"
+						></textarea>
+					</div>
+					<input type="submit" class="btn btn-success" value="update" />
+				</form>
+				{%else%}
+				<table class="music_table" style="width:100%">
+					<tr>
+						<th>Name</th>
+						<th>Artist</th>
+						<th>Albums</th>
+						<th>Likes</th>
+						<th>Action</th>
+					</tr>
+					{% if song %} {% for x in song%}
+					<tr>
+						<td>{{ x.name }}</td>
+						<td>{{x.author}}</td>
+						<td>{{x.album}}</td>
+						<td>{{x.likes}}</td>
+						<td class="form_input">
+							<form class="detail_form" action="/music_detail" method="POST">
+								<input name="id" value="{{x.id}}" type="hidden" />
+								<input type="submit" value="detail" />
+							</form>
+							<a href="/music_delete">delete</a>
+						</td>
+					</tr>
+					{% endfor %} {% endif %} {% endif %}
+				</table>
+			</section>
+		</main>
+		<footer></footer>
+	</body>
+	{% include './partial/jq.html' %}
+	<script src="{{ url_for('static',filename='js/detail_request.js') }}"></script>
+</html>
