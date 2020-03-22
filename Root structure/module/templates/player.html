@@ -15,7 +15,7 @@
 			crossorigin="anonymous"
 		/>
 	</head>
-	<body>
+	<body class=" bg-dark text-white">
 		<header class="header_grid">
 			<div class="item1">
 				<audio controls class="music_player">
@@ -27,8 +27,12 @@
 					Your browser does not support the audio element.
 				</audio>
 			</div>
-			<div></div>
-			<div></div>
+			<div class="d-flex justify-content-center">
+				<a class="navbar-brand" href="#">Logo</a>
+			</div>
+			<div class="d-flex justify-content-center">
+				<button type="button" class="btn btn-light">Login</button>
+			</div>
 		</header>
 		<main>
 			<section class="control_grid">
@@ -36,26 +40,35 @@
 					{% include './partial/model.html' %}
 				</div>
 				<div class="d-flex justify-content-center">
-					<div class="btn-group btn-group-toggle" data-toggle="buttons">
-						<label class="btn btn-secondary">
-							<input
-								type="radio"
-								name="options"
-								id="option1"
-								autocomplete="off"
-							/>
-							song
-						</label>
-						<label class="btn btn-secondary">
-							<input
-								type="radio"
-								name="options"
-								id="option2"
-								autocomplete="off"
-							/>
-							Albums
-						</label>
-					</div>
+					<form
+						id="select_form"
+						action="/select_form"
+						method="POST"
+						class="d-flex justify-content-center"
+					>
+						<div class="btn-group btn-group-toggle">
+							<label class="btn btn-secondary">
+								<input
+									type="radio"
+									name="options"
+									id="option1"
+									value="Song"
+									class="change"
+								/>
+								Song
+							</label>
+							<label class="btn btn-secondary">
+								<input
+									type="radio"
+									name="options"
+									id="option2"
+									value="Album"
+									class="change"
+								/>
+								Albums
+							</label>
+						</div>
+					</form>
 				</div>
 				<div></div>
 			</section>
@@ -100,12 +113,15 @@
 							class="form-control"
 							name="lyrics"
 							id="{{detail.lyrics}}"
-							rows="3"
-						></textarea>
+							rows="10"
+							style="height: 500px;"
+						>
+{{detail.lyrics}}</textarea
+						>
 					</div>
 					<input type="submit" class="btn btn-success" value="update" />
 				</form>
-				{%else%}
+				{%elif song%}
 				<table class="music_table" style="width:100%">
 					<tr>
 						<th>Name</th>
@@ -114,25 +130,85 @@
 						<th>Likes</th>
 						<th>Action</th>
 					</tr>
-					{% if song %} {% for x in song%}
+					{% for x in song%}
 					<tr>
 						<td>{{ x.name }}</td>
 						<td>{{x.author}}</td>
-						<td>{{x.album}}</td>
+						<td><img class="album_img" src="{{x.img}}" />{{x.album}}</td>
 						<td>{{x.likes}}</td>
-						<td class="form_input">
-							<form class="detail_form" action="/music_detail" method="POST">
+						<td class="form_input d-flex justify-content-between">
+							<form class="detail_form  " action="/music_detail" method="POST">
 								<input name="id" value="{{x.id}}" type="hidden" />
-								<input type="submit" value="detail" />
+								<input
+									type="image"
+									src="https://i.ibb.co/XVTw4nh/edit.png"
+									value="Edit detail"
+									class="img_btn"
+								/>
 							</form>
-							<a href="/music_delete">delete</a>
+							<form class="detail_form" action="/music_delete" method="POST">
+								<input name="id" value="{{x.id}}" type="hidden" />
+								<input
+									type="image"
+									src="https://i.ibb.co/LzkKdBM/delete.png"
+									value="Delete song"
+									class="img_btn"
+								/>
+							</form>
 						</td>
 					</tr>
-					{% endfor %} {% endif %} {% endif %}
+					{% endfor %}
 				</table>
+
+				{%elif album%}
+				<table class="music_table" style="width:100%">
+					<tr>
+						<th>Name</th>
+						<th>Artist</th>
+						<th>Genre</th>
+						<th>Year</th>
+						<th>like</th>
+						<th>Action</th>
+					</tr>
+					{% for x in album%}
+					<tr>
+						<td>{{ x.name }}</td>
+						<td>{{x.author}}</td>
+						<td>{{x.genre}}</td>
+						<td>{{x.year}}</td>
+						<td>{{x.like}}</td>
+						<td class="form_input d-flex justify-content-between">
+							<form class="detail_form  " action="/music_detail" method="POST">
+								<input name="id" value="{{x.id}}" type="hidden" />
+								<input
+									type="image"
+									src="https://i.ibb.co/XVTw4nh/edit.png"
+									value="Edit detail"
+									class="img_btn"
+								/>
+							</form>
+							<form class="detail_form" action="/music_delete" method="POST">
+								<input name="id" value="{{x.id}}" type="hidden" />
+								<input
+									type="image"
+									src="https://i.ibb.co/LzkKdBM/delete.png"
+									value="Delete song"
+									class="img_btn"
+								/>
+							</form>
+						</td>
+					</tr>
+					{% endfor %}
+				</table>
+
+				{% endif %}
 			</section>
 		</main>
-		<footer></footer>
+		<footer class="page-footer font-small bottom">
+			<div class="footer-copyright text-center py-3">
+				© 2020 Copyright:
+			</div>
+		</footer>
 	</body>
 	{% include './partial/jq.html' %}
 	<script src="{{ url_for('static',filename='js/detail_request.js') }}"></script>

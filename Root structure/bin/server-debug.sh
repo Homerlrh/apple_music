@@ -2,4 +2,4 @@
 export FLASK_APP=main.py
 export FLASK_ENV=development
 
-python3 -m flask run --port 3000 --no-reload
+py -m flask run --port 3000 --no-reload

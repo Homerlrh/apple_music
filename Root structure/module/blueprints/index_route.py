@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request
+from flask import Blueprint, render_template, request, url_for, redirect
 from sqlalchemy.sql.expression import bindparam
 from .. import db
 from ..Src.album import Album
@@ -9,22 +9,29 @@ main = Blueprint("main", __name__)
 
 @main.route("/", methods=['get'])
 def index():
-
     return render_template("login.html")
 
 
-@main.route("/m", methods=["post"])
-def sent():
-    print("hello")
-    data = request.form
-    return data
-
-
 @main.route("/mp", methods=["get"])
-def music_player():
+def get_all_song():
     all_song = Song.query.all()
     print(all_song[0].url)
     return render_template("player.html", song=all_song)
+
+
+@main.route("/album", methods=["get"])
+def get_all_album():
+    all_album = Album.query.all()
+    print(all_album)
+    return render_template("player.html", album=all_album)
+
+
+@main.route("/music_detail", methods=["post"])
+def get_song_detail():
+    data = request.form
+    detail_song = Song.query.filter_by(id=int(data["id"])).first()
+    print(detail_song)
+    return render_template("player.html", detail=detail_song)
 
 
 @main.route("/addsong", methods=["get"])
@@ -51,12 +58,13 @@ def update_song():
     return ("Song successfully update")
 
 
-@main.route("/music_detail", methods=["post"])
-def get_song_detail():
+@main.route("/select_form", methods=["post"])
+def Body_change():
     data = request.form
-    detail_song = Song.query.filter_by(id=int(data["id"])).first()
-    print(detail_song)
-    return render_template("player.html", detail=detail_song)
+    if data["options"] == "Song":
+        return redirect(url_for("main.get_all_song"))
+    else:
+        return redirect(url_for("main.get_all_album"))
 
 
 def add_song_function(song):

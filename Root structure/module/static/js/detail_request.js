@@ -40,3 +40,8 @@ $(function() {
 		});
 	});
 });
+$(".change[name=options]").change(function() {
+	$("#select_form").submit();
+});
+
+$("textarea").autoResize();

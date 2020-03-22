@@ -1,5 +1,6 @@
 from flask import Flask, Blueprint, render_template, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
+from flask_bootstrap import Bootstrap
 import os
 
 basedir = os.path.abspath(os.path.dirname(__file__))
@@ -13,7 +14,7 @@ def create_app():
     app = Flask(__name__, template_folder="templates")
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///db.sqlite'
     db.init_app(app)
-
+    Bootstrap(app)
     from .blueprints.index_route import main
     app.register_blueprint(main)
 
