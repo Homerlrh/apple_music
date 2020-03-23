@@ -64,3 +64,8 @@ td {
 .album_img {
 	width: 34px;
 }
+
+.of {
+	overflow-y: scroll;
+	max-height: 700px;
+}

@@ -42,7 +42,7 @@
 				<div class="d-flex justify-content-center">
 					<form
 						id="select_form"
-						action="/select_form"
+						action="/user/select_form"
 						method="POST"
 						class="d-flex justify-content-center"
 					>
@@ -134,10 +134,14 @@
 					<tr>
 						<td>{{ x.name }}</td>
 						<td>{{x.author}}</td>
-						<td><img class="album_img" src="{{x.img}}" />{{x.album}}</td>
+						<td><img class="album_img" src="{{x.img}}" /> {{x.album}}</td>
 						<td>{{x.likes}}</td>
 						<td class="form_input d-flex justify-content-between">
-							<form class="detail_form  " action="/music_detail" method="POST">
+							<form
+								class="detail_form  "
+								action="/user/music_detail"
+								method="POST"
+							>
 								<input name="id" value="{{x.id}}" type="hidden" />
 								<input
 									type="image"
@@ -146,7 +150,11 @@
 									class="img_btn"
 								/>
 							</form>
-							<form class="detail_form" action="/music_delete" method="POST">
+							<form
+								class="detail_form"
+								action="/user/music_delete"
+								method="POST"
+							>
 								<input name="id" value="{{x.id}}" type="hidden" />
 								<input
 									type="image"
@@ -178,7 +186,11 @@
 						<td>{{x.year}}</td>
 						<td>{{x.like}}</td>
 						<td class="form_input d-flex justify-content-between">
-							<form class="detail_form  " action="/music_detail" method="POST">
+							<form
+								class="detail_form  "
+								action="/user/music_detail"
+								method="POST"
+							>
 								<input name="id" value="{{x.id}}" type="hidden" />
 								<input
 									type="image"
@@ -187,7 +199,11 @@
 									class="img_btn"
 								/>
 							</form>
-							<form class="detail_form" action="/music_delete" method="POST">
+							<form
+								class="detail_form"
+								action="/user/music_delete"
+								method="POST"
+							>
 								<input name="id" value="{{x.id}}" type="hidden" />
 								<input
 									type="image"

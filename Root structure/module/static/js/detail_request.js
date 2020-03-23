@@ -1,35 +1,10 @@
-// const frm = document.querySelector("#update_form");
-
-// const ajax_request = (url, data) => {
-// 	$.ajax({
-// 		url: url,
-// 		type: "post",
-// 		data: data,
-// 		success: function(data) {
-// 			alert(`${data} i think i have the data`);
-// 		},
-// 		error: function(data) {
-// 			console.log(data);
-// 		},
-// 	});
-// };
-
-// frm.forEach((x) => {
-// 	x.addEventListener("submit", (e) => {
-// 		e.preventDefault();
-// 		const data = $(x).serialize();
-// 		console.log(data);
-// 		ajax_request("/music_detail", data);
-// 	});
-// });
-
 $(function() {
 	const frm = $("#update_form");
 	frm.submit((e) => {
 		e.preventDefault();
 		$.ajax({
 			type: "post",
-			url: "/updatesong",
+			url: "/user/updatesong",
 			data: frm.serialize(),
 			success: function(data) {
 				alert(`${data}`);
@@ -39,9 +14,24 @@ $(function() {
 			},
 		});
 	});
-});
-$(".change[name=options]").change(function() {
-	$("#select_form").submit();
-});
 
-$("textarea").autoResize();
+	$(".change[name=options]").change(function() {
+		$("#select_form").submit();
+	});
+
+	// $("#add_song").submit((e) => {
+	// 	e.preventDefault();
+	// 	$.ajax({
+	// 		type: "post",
+	// 		url: "/user/addsong",
+	// 		data: $("#add_song").serialize(),
+	// 		success: function(data) {
+	// 			// alert(`${data}`);
+	// 			console.log(JSON.stringify(data));
+	// 		},
+	// 		error: function(data) {
+	// 			alert(`${data}"An error occurred.""`);
+	// 		},
+	// 	});
+	// });
+});
