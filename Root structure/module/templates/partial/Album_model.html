@@ -4,7 +4,7 @@
 	data-toggle="modal"
 	data-target="#exampleModal"
 >
-	Add song
+	Add Album
 </button>
 
 <!-- Modal -->
@@ -19,7 +19,7 @@
 	<div class="modal-dialog" role="document" style="color: black;">
 		<div class="modal-content">
 			<div class="modal-header">
-				<h5 class="modal-title" id="exampleModalLabel">Add song</h5>
+				<h5 class="modal-title" id="exampleModalLabel">Add album</h5>
 				<button
 					type="button"
 					class="close"
@@ -31,52 +31,43 @@
 			</div>
 			<div class="modal-body text-black of">
 				<form
-					id="add_song"
+					id="add_Album"
 					style="margin-top: 10px;"
 					method="POST"
-					action="/user/addsong"
+					action="/user/addalbum"
 				>
 					<div class="form-group">
 						<label for="">Name</label>
 						<input type="text" class="form-control" name="name" value="" />
 					</div>
-					<div class="form-group">
-						<label for="">Song link</label>
-						<input
-							type="url"
-							class="form-control"
-							name="Song_link"
-							value=""
-							required
-						/>
-					</div>
-					<div class="form-group">
+					<div class="form-group" hidden>
 						<label for="">Img link</label>
-						<input type="url" class="form-control" name="Img_link" value="" />
+						<input
+							type="text"
+							class="form-control"
+							name="Img_link"
+							id="img_src"
+							value=""
+						/>
 					</div>
 					<div class="form-group">
 						<label for="">Artist</label>
 						<input type="text" class="form-control" name="artist" value="" />
 					</div>
 					<div class="form-group">
-						<label for="">Album</label>
-						<input type="text" class="form-control" name="album" value="" />
+						<label for="">Genre</label>
+						<input type="text" class="form-control" name="genre" value="" />
 					</div>
 					<div class="form-group">
 						<label for="">Year</label>
 						<input type="text" class="form-control" name="year" value="" />
 					</div>
-					<div class="form-group">
-						<label for="">Lyrics</label>
-						<textarea
-							class="form-control"
-							name="lyrics"
-							id="lyric"
-							rows="10"
-							style="height: 500px;"
-						></textarea>
-					</div>
 				</form>
+				<form
+					action="/user/img_upload"
+					class="dropzone"
+					id="my-awesome-dropzone"
+				></form>
 			</div>
 			<div class="modal-footer">
 				<button type="button" class="btn btn-secondary" data-dismiss="modal">
@@ -86,7 +77,7 @@
 					type="submit"
 					class="btn btn-primary"
 					id="trigger_button"
-					form="add_song"
+					form="add_Album"
 				>
 					Add
 				</button>

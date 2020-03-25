@@ -3,7 +3,7 @@ from .. import db
 
 class Song(db.Model):
     __tablename__ = "song"
-    id = db.Column(db.Integer, primary_key=True)
+    __id = db.Column(db.Integer, primary_key=True)
     url = db.Column(db.String(999), unique=False, nullable=False)
     img = db.Column(db.String(
         999), default="https://icons.iconarchive.com/icons/papirus-team/papirus-mimetypes/512/unknown-icon.png", unique=False, nullable=True)
@@ -11,6 +11,8 @@ class Song(db.Model):
                      unique=False, nullable=True)
     author = db.Column(db.String(80), default="unknow",
                        unique=False, nullable=True)
+    album_id = db.Column(db.Integer, db.ForeignKey('album._Album__id'),
+                         nullable=False)
     album = db.Column(db.String(80), default="unknow")
     lyrics = db.Column(db.String(888888), default="unknown",
                        unique=False, nullable=True)

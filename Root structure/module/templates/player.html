@@ -14,13 +14,16 @@
 			integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
 			crossorigin="anonymous"
 		/>
+		{%if a%} {{ dropzone.load_css() }}{{ dropzone.style('border: 2px dashed
+		#0087F7; margin: 10%; min-height: 400px;') }} {%endif%}
 	</head>
 	<body class=" bg-dark text-white">
 		<header class="header_grid">
 			<div class="item1">
-				<audio controls class="music_player">
+				<audio controls id="music_player">
 					<!-- <source src="#" type="audio/ogg" />-->
 					<source
+						id="source_link"
 						src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"
 						type="audio/mpeg"
 					/>
@@ -37,7 +40,8 @@
 		<main>
 			<section class="control_grid">
 				<div>
-					{% include './partial/model.html' %}
+					{%if a%} {% include './partial/Album_model.html' %} {%else%} {%
+					include './partial/Song_model.html' %} {%endif%}
 				</div>
 				<div class="d-flex justify-content-center">
 					<form
@@ -76,7 +80,7 @@
 			<section class="music_container">
 				{% if detail%}
 				<form id="update_form" style="margin-top: 10px;">
-					<input name="id" value="{{detail.id}}" type="hidden" />
+					<input name="id" value="{{detail._Song__id}}" type="hidden" />
 					<div class="form-group">
 						<label for="{{detail.name}}">Name</label>
 						<input
@@ -132,9 +136,16 @@
 					</tr>
 					{% for x in song%}
 					<tr>
-						<td>{{ x.name }}</td>
+						<td class="song_name" url="{{x.url}}">{{ x.name }}</td>
 						<td>{{x.author}}</td>
-						<td><img class="album_img" src="{{x.img}}" /> {{x.album}}</td>
+						<td>
+							{%if x.img ==
+							"https://icons.iconarchive.com/icons/papirus-team/papirus-mimetypes/512/unknown-icon.png"%}
+							<img class="album_img" src="{{x.img}}" />
+							{%else%}
+							<img class="album_img" src="../static/img/{{x.img}}" />
+							{%endif%} {{x.album}}
+						</td>
 						<td>{{x.likes}}</td>
 						<td class="form_input d-flex justify-content-between">
 							<form
@@ -142,7 +153,7 @@
 								action="/user/music_detail"
 								method="POST"
 							>
-								<input name="id" value="{{x.id}}" type="hidden" />
+								<input name="id" value="{{x._Song__id}}" type="hidden" />
 								<input
 									type="image"
 									src="https://i.ibb.co/XVTw4nh/edit.png"
@@ -155,7 +166,7 @@
 								action="/user/music_delete"
 								method="POST"
 							>
-								<input name="id" value="{{x.id}}" type="hidden" />
+								<input name="id" value="{{x._Song__id}}" type="hidden" />
 								<input
 									type="image"
 									src="https://i.ibb.co/LzkKdBM/delete.png"
@@ -188,27 +199,27 @@
 						<td class="form_input d-flex justify-content-between">
 							<form
 								class="detail_form  "
-								action="/user/music_detail"
+								action="/user/all_song_in_album"
 								method="POST"
 							>
-								<input name="id" value="{{x.id}}" type="hidden" />
+								<input name="id" value="{{x._Album__id}}" type="hidden" />
 								<input
 									type="image"
 									src="https://i.ibb.co/XVTw4nh/edit.png"
-									value="Edit detail"
+									value="all song"
 									class="img_btn"
 								/>
 							</form>
 							<form
 								class="detail_form"
-								action="/user/music_delete"
+								action="/user/delete_album"
 								method="POST"
 							>
-								<input name="id" value="{{x.id}}" type="hidden" />
+								<input name="id" value="{{x._Album__id}}" type="hidden" />
 								<input
 									type="image"
 									src="https://i.ibb.co/LzkKdBM/delete.png"
-									value="Delete song"
+									value="Delete album"
 									class="img_btn"
 								/>
 							</form>
@@ -228,4 +239,8 @@
 	</body>
 	{% include './partial/jq.html' %}
 	<script src="{{ url_for('static',filename='js/detail_request.js') }}"></script>
+	{% if a %} {{ dropzone.load_js() }}{{ dropzone.config(max_files=1,
+	timeout=10000, default_message='Drop here!') }}
+	<script src="{{ url_for('static',filename='js/submit_img.js') }}"></script>
+	{% endif %}
 </html>
