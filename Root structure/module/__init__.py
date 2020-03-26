@@ -2,6 +2,7 @@ from flask import Flask, Blueprint, render_template, request, jsonify
 from flask_dropzone import Dropzone
 from flask_sqlalchemy import SQLAlchemy
 from flask_bootstrap import Bootstrap
+from dotenv import load_dotenv
 import os
 
 basedir = os.path.abspath(os.path.dirname(__file__))
@@ -12,9 +13,10 @@ db = SQLAlchemy()
 
 
 def create_app():
+    load_dotenv()
     app = Flask(__name__, template_folder="templates")
-    app.config["SECRET_KEY"] = "$2y$04$RsF3IDeklJqOHS/GV7JaSeZtUwUKSX/oqAZRQurtHSnxNo3a4M3fC"
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///db.sqlite'
+    app.config["SECRET_KEY"] = os.getenv("S_K")
+    app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv("DB_uri")
     app.config["IMG_UPLOAD"] = "module\static\img"
     db.init_app(app)
     Bootstrap(app)

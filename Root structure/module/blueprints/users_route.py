@@ -2,6 +2,7 @@ from flask import Blueprint, render_template, request, url_for, redirect, curren
 from .. import db
 from ..Src.album import Album
 from ..Src.song import Song
+import pylast
 import os
 
 users = Blueprint("users", __name__)
@@ -9,6 +10,7 @@ users = Blueprint("users", __name__)
 
 @users.route("/user/Song", methods=["get"])
 def get_all_song():
+
     all_song = Song.query.all()
     print(all_song)
     if(all_song):
@@ -34,7 +36,6 @@ def get_song_detail():
 
 @users.route("/user/addsong", methods=["post"])
 def add_song():
-
     data = change_to_default(request.form)
     if data["album"] == None:
         data["album"] = "unknow"
@@ -51,20 +52,21 @@ def add_song():
 @users.route("/user/addalbum", methods=["post"])
 def add_album():
     data = change_to_default(request.form)
+    img_link = get_cover_art(data["artist"], data["name"])
     if data["name"] == None:
         data["name"] = "unknow"
+        img_link = None
     is_album = Album.query.filter_by(name=data["name"]).first()
     if is_album:
         return ("Album is already exist, please check again")
     else:
         add_song_function(
-            Album(cover_img=data["Img_link"], name=data["name"], author=data["artist"], genre=data["genre"], year=data["year"]))
+            Album(cover_img=img_link, name=data["name"], author=data["artist"], genre=data["genre"], year=data["year"]))
         return redirect(url_for("users.get_all_album"))
 
 
 @users.route("/user/updatesong", methods=["post"])
 def update_song():
-    # print("hello")
     data = request.form
     stmt = {"name": data["name"],
             "author": data["author"],
@@ -78,7 +80,6 @@ def update_song():
 @users.route("/user/music_delete", methods=['post'])
 def delete_song():
     data = request.form
-    print(data["id"])
     db.session.query(Song).filter_by(_Song__id=data["id"]).delete()
     db.session.commit()
     return redirect(url_for("users.get_all_song"))
@@ -87,10 +88,16 @@ def delete_song():
 @users.route("/user/all_song_in_album", methods=['post'])
 def song_in_album():
     album_id = request.form["id"]
-    print(album_id)
     song_in_album = db.session.query(Song).filter_by(album_id=album_id).all()
-
     return render_template("player.html", song=song_in_album)
+
+
+@users.route("/user/delete_album", methods=['post'])
+def delete_album():
+    data = request.form
+    db.session.query(Album).filter_by(_Album__id=data["id"]).delete()
+    db.session.commit()
+    return redirect(url_for("users.get_all_album"))
 
 
 @users.route("/user/select_form", methods=["post"])
@@ -102,19 +109,6 @@ def Body_change():
         return redirect(url_for("users.get_all_album"))
 
 
-def allow_pic(filename):
-    Allow_list = ["PNG", "JPG", "JPEG"]
-
-    if not "." in filename:
-        return False
-    ext = filename.rsplit(".", 1)[1]
-
-    if ext.upper() in Allow_list:
-        return True
-    else:
-        return False
-
-
 @users.route("/user/img_upload", methods=["POST"])
 def upload():
     if request.files:
@@ -122,24 +116,21 @@ def upload():
         if allow_pic(f.filename):
             path = os.path.join(current_app.config["IMG_UPLOAD"], f.filename)
             f.save(path)
-            print("yes")
             return f.filename, 200
         else:
-            print("no")
             return "image type is not supported, submit another one", 400
 
-    #     img = request.files["image"]
-    #     print(img.filename)
-    #     if allow_pic(img.filename):
-    #         path = os.path.join(
-    #             current_app.config["IMG_UPLOAD"], img.filename)
-    #         img.save(path)
-    #         return (f"image is saved,{path}")
-    #     else:
-    #         return ("image type is not supported, submit another one")
-    # else:
-    #     print(request.form)
-    #     return ("you did not upload")
+
+def get_cover_art(artist, album):
+    API_KEY = os.getenv("API_KEY")
+    API_SECRET = os.getenv("API_SECRET")
+    username = os.getenv("API_usename")
+    password_hash = pylast.md5(os.getenv("API_passwor"))
+    network = pylast.LastFMNetwork(api_key=API_KEY, api_secret=API_SECRET,
+                                   username=username, password_hash=password_hash)
+    # Now you can use that object everywhere
+    cover_art = network.get_album(artist, album).get_cover_image()
+    return cover_art
 
 
 def add_song_function(song):
@@ -156,3 +147,16 @@ def change_to_default(dic):
         else:
             dicw[k] = v
     return dicw
+
+
+def allow_pic(filename):
+    Allow_list = ["PNG", "JPG", "JPEG"]
+
+    if not "." in filename:
+        return False
+    ext = filename.rsplit(".", 1)[1]
+
+    if ext.upper() in Allow_list:
+        return True
+    else:
+        return False

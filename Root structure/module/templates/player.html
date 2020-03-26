@@ -15,7 +15,7 @@
 			crossorigin="anonymous"
 		/>
 		{%if a%} {{ dropzone.load_css() }}{{ dropzone.style('border: 2px dashed
-		#0087F7; margin: 10%; min-height: 400px;') }} {%endif%}
+		#0087F7; margin: 10%; min-height: 200px;') }} {%endif%}
 	</head>
 	<body class=" bg-dark text-white">
 		<header class="header_grid">
@@ -139,12 +139,8 @@
 						<td class="song_name" url="{{x.url}}">{{ x.name }}</td>
 						<td>{{x.author}}</td>
 						<td>
-							{%if x.img ==
-							"https://icons.iconarchive.com/icons/papirus-team/papirus-mimetypes/512/unknown-icon.png"%}
 							<img class="album_img" src="{{x.img}}" />
-							{%else%}
-							<img class="album_img" src="../static/img/{{x.img}}" />
-							{%endif%} {{x.album}}
+							{{x.album}}
 						</td>
 						<td>{{x.likes}}</td>
 						<td class="form_input d-flex justify-content-between">
