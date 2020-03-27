@@ -8,13 +8,13 @@ class Song(db.Model):
     img             = db.Column(db.String(
         999), default="https://icons.iconarchive.com/icons/papirus-team/papirus-mimetypes/512/unknown-icon.png", unique=False, nullable=True)
     alb_img         = db.Column(db.String(999), unique=False, nullable=True)
-    name            = db.Column(db.String(80), default="unknow",
+    name            = db.Column(db.String(80), default="unknown",
                      unique=False, nullable=True)
-    author          = db.Column(db.String(80), default="unknow",
+    author          = db.Column(db.String(80), default="unknown",
                        unique=False, nullable=True)
     album_id        = db.Column(db.Integer, db.ForeignKey('album._Album__id'),
                          nullable=False)
-    album           = db.Column(db.String(80), default="unknow")
+    album           = db.Column(db.String(80), default="n/a")
     duration        = db.Column(db.String(25), default="0:0.0",
                          unique=False, nullable=True)
     lyrics          = db.Column(db.String(888888), default="unknown",
