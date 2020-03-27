@@ -17,15 +17,15 @@ $("#img_upl").submit(function(e) {
 });
 
 const myDropzone = $("#mydropzone");
-myDropzone.on("success", function(file) {
+myDropzone.on("success", (file) => {
 	console.log("hi");
 });
 
 Dropzone.options.myAwesomeDropzone = {
 	init: function() {
 		thisDropzone = this;
-		this.on("success", function(file, responseText) {
-			alert(responseText);
+		this.on("success", (file, responseText) => {
+			alert("File is successfully submit");
 			$("#song_src").val(responseText);
 		});
 	},

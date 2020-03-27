@@ -2,10 +2,10 @@ from flask import Blueprint, render_template, request, url_for, redirect, curren
 from .. import db
 from ..Src.album import Album
 from ..Src.song import Song
-import pylast
-import os
 from .helper_method.helper import get_info
 import boto3
+import pylast
+import os
 
 users = Blueprint("users", __name__)
 get_info = get_info()
@@ -128,7 +128,7 @@ def upload():
             s3.Bucket("apple-clone").put_object(Key=f.filename, Body=f)
             return f"https://apple-clone.s3-us-west-2.amazonaws.com/{f.filename}"
         else:
-            return "image type is not supported, submit another one", 400
+            return "Type is not supported, submit another one", 400
 
 
 def add_song_function(song):
