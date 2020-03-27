@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Music Player</title>
+		<link
+			rel="stylesheet"
+			href="{{ url_for('static',filename='css/mp.css') }}"
+		/>
+		<link
+			rel="stylesheet"
+			href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+			integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
+			crossorigin="anonymous"
+		/>
+		{{ dropzone.load_css() }}{{ dropzone.style('border: 2px dashed #0087F7;
+		margin: 10%; min-height: 200px;') }}
+	</head>
+	<body class=" bg-dark text-white">
+		<header class="header_grid">
+			<div class="item1">
+				<audio controls id="music_player">
+					<!-- <source src="#" type="audio/ogg" />-->
+					<source
+						id="source_link"
+						src="https://apple-clone.s3-us-west-2.amazonaws.com/AGA - 圆.mp3"
+						type="audio/mpeg"
+					/>
+				</audio>
+			</div>
+			<div class="d-flex justify-content-center">
+				<a class="navbar-brand" href="#">Logo</a>
+			</div>
+			<div class="d-flex justify-content-center">
+				<button type="button" class="btn btn-light">Login</button>
+			</div>
+		</header>
+		<main>
+			<section class="control_grid">
+				<div>
+					{%if a%} {% include './partial/Album_model.html' %} {%else%} {%
+					include './partial/Song_model.html' %} {%endif%}
+				</div>
+				<div class="d-flex justify-content-center">
+					<form
+						id="select_form"
+						action="/user/select_form"
+						method="POST"
+						class="d-flex justify-content-center"
+					>
+						<div class="btn-group btn-group-toggle">
+							<label class="btn btn-secondary">
+								<input
+									type="radio"
+									name="options"
+									id="option1"
+									value="Song"
+									class="change"
+								/>
+								Song
+							</label>
+							<label class="btn btn-secondary">
+								<input
+									type="radio"
+									name="options"
+									id="option2"
+									value="Album"
+									class="change"
+								/>
+								Albums
+							</label>
+						</div>
+					</form>
+				</div>
+				<div></div>
+			</section>
+
+			<section class="music_container">
+				{% if detail%}
+				<form id="update_form" style="margin-top: 10px;">
+					<input name="id" value="{{detail._Song__id}}" type="hidden" />
+					<div class="form-group">
+						<label for="{{detail.name}}">Name</label>
+						<input
+							type="text"
+							class="form-control"
+							name="name"
+							id="{{detail.name}}"
+							value="{{detail.name}}"
+						/>
+					</div>
+					<div class="form-group">
+						<label for="{{detail.author}}">Artists</label>
+						<input
+							type="text"
+							class="form-control"
+							name="author"
+							id="{{detail.author}}"
+							value="{{detail.author}}"
+						/>
+					</div>
+					<div class="form-group">
+						<label for="{{detail.album}}">Album</label>
+						<input
+							type="text"
+							name="Album"
+							class="form-control"
+							id="{{detail.album}}"
+							value="{{detail.album}}"
+						/>
+					</div>
+					<div class="form-group">
+						<label for="{{detail.lyrics}}">Lyrics</label>
+						<textarea
+							class="form-control"
+							name="lyrics"
+							id="{{detail.lyrics}}"
+							rows="10"
+							style="height: 500px;"
+						>
+{{detail.lyrics}}</textarea
+						>
+					</div>
+					<input type="submit" class="btn btn-success" value="update" />
+				</form>
+				{%elif song%}
+				<table class="music_table" style="width:100%">
+					<tr>
+						<th>Name</th>
+						<th>Artist</th>
+						<th>Albums</th>
+						<th>Duration</th>
+						<th>Likes</th>
+						<th>Action</th>
+					</tr>
+					{% for x in song%}
+					<tr>
+						<td class="song_name" url="{{x.url}}">
+							<img class="album_img" src="{{x.img}}" /> {{ x.name }}
+						</td>
+						<td>{{x.author}}</td>
+						<td>
+							<img class="album_img" src="{{x.alb_img}}" />
+							{{x.album}}
+						</td>
+						<td>{{x.duration}}</td>
+						<td>{{x.likes}}</td>
+						<td class="form_input d-flex justify-content-between">
+							<form
+								class="detail_form  "
+								action="/user/music_detail"
+								method="POST"
+							>
+								<input name="id" value="{{x._Song__id}}" type="hidden" />
+								<input
+									type="image"
+									src="https://i.ibb.co/XVTw4nh/edit.png"
+									value="Edit detail"
+									class="img_btn"
+								/>
+							</form>
+							<form
+								class="detail_form"
+								action="/user/music_delete"
+								method="POST"
+							>
+								<input name="id" value="{{x._Song__id}}" type="hidden" />
+								<input
+									type="image"
+									src="https://i.ibb.co/LzkKdBM/delete.png"
+									value="Delete song"
+									class="img_btn"
+								/>
+							</form>
+						</td>
+					</tr>
+					{% endfor %}
+				</table>
+
+				{%elif album%}
+				<table class="music_table" style="width:100%">
+					<tr>
+						<th>Name</th>
+						<th>Artist</th>
+						<th>Genre</th>
+						<th>Published date</th>
+						<th>like</th>
+						<th>Action</th>
+					</tr>
+					{% for x in album%}
+					<tr>
+						<td>
+							<img class="album_img" src="{{x.cover_img}}" /> {{ x.name }}
+						</td>
+						<td>{{x.author}}</td>
+						<td>{{x.genre}}</td>
+						<td>{{x.year}}</td>
+						<td>{{x.like}}</td>
+						<td class="form_input d-flex justify-content-between">
+							<form
+								class="detail_form  "
+								action="/user/all_song_in_album"
+								method="POST"
+							>
+								<input name="id" value="{{x._Album__id}}" type="hidden" />
+								<input
+									type="image"
+									src="https://i.ibb.co/XVTw4nh/edit.png"
+									value="all song"
+									class="img_btn"
+								/>
+							</form>
+							<form
+								class="detail_form"
+								action="/user/delete_album"
+								method="POST"
+							>
+								<input name="id" value="{{x._Album__id}}" type="hidden" />
+								<input
+									type="image"
+									src="https://i.ibb.co/LzkKdBM/delete.png"
+									value="Delete album"
+									class="img_btn"
+								/>
+							</form>
+						</td>
+					</tr>
+					{% endfor %}
+				</table>
+
+				{% endif %}
+			</section>
+		</main>
+		<footer class="page-footer font-small bottom">
+			<div class="footer-copyright text-center py-3">
+				© 2020 Copyright:
+			</div>
+		</footer>
+	</body>
+	{% include './partial/jq.html' %}
+	<script src="{{ url_for('static',filename='js/detail_request.js') }}"></script>
+	{{ dropzone.load_js() }}{{ dropzone.config(max_files=1, timeout=10000,
+	default_message='Drop here!') }}
+	<script src="{{ url_for('static',filename='js/submit_song.js') }}"></script>
+</html>
