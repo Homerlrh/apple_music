@@ -14,8 +14,8 @@
 			integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
 			crossorigin="anonymous"
 		/>
-		{%if a%} {{ dropzone.load_css() }}{{ dropzone.style('border: 2px dashed
-		#0087F7; margin: 10%; min-height: 200px;') }} {%endif%}
+		{{ dropzone.load_css() }}{{ dropzone.style('border: 2px dashed #0087F7;
+		margin: 10%; min-height: 200px;') }}
 	</head>
 	<body class=" bg-dark text-white">
 		<header class="header_grid">
@@ -24,10 +24,9 @@
 					<!-- <source src="#" type="audio/ogg" />-->
 					<source
 						id="source_link"
-						src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"
+						src="https://apple-clone.s3-us-west-2.amazonaws.com/AGA - 圆.mp3"
 						type="audio/mpeg"
 					/>
-					Your browser does not support the audio element.
 				</audio>
 			</div>
 			<div class="d-flex justify-content-center">
@@ -131,17 +130,21 @@
 						<th>Name</th>
 						<th>Artist</th>
 						<th>Albums</th>
+						<th>Duration</th>
 						<th>Likes</th>
 						<th>Action</th>
 					</tr>
 					{% for x in song%}
 					<tr>
-						<td class="song_name" url="{{x.url}}">{{ x.name }}</td>
+						<td class="song_name" url="{{x.url}}">
+							<img class="album_img" src="{{x.img}}" /> {{ x.name }}
+						</td>
 						<td>{{x.author}}</td>
 						<td>
-							<img class="album_img" src="{{x.img}}" />
+							<img class="album_img" src="{{x.alb_img}}" />
 							{{x.album}}
 						</td>
+						<td>{{x.duration}}</td>
 						<td>{{x.likes}}</td>
 						<td class="form_input d-flex justify-content-between">
 							<form
@@ -181,13 +184,15 @@
 						<th>Name</th>
 						<th>Artist</th>
 						<th>Genre</th>
-						<th>Year</th>
+						<th>Published date</th>
 						<th>like</th>
 						<th>Action</th>
 					</tr>
 					{% for x in album%}
 					<tr>
-						<td>{{ x.name }}</td>
+						<td>
+							<img class="album_img" src="{{x.cover_img}}" /> {{ x.name }}
+						</td>
 						<td>{{x.author}}</td>
 						<td>{{x.genre}}</td>
 						<td>{{x.year}}</td>
@@ -235,8 +240,7 @@
 	</body>
 	{% include './partial/jq.html' %}
 	<script src="{{ url_for('static',filename='js/detail_request.js') }}"></script>
-	{% if a %} {{ dropzone.load_js() }}{{ dropzone.config(max_files=1,
-	timeout=10000, default_message='Drop here!') }}
-	<script src="{{ url_for('static',filename='js/submit_img.js') }}"></script>
-	{% endif %}
+	{{ dropzone.load_js() }}{{ dropzone.config(max_files=1, timeout=10000,
+	default_message='Drop here!') }}
+	<script src="{{ url_for('static',filename='js/submit_song.js') }}"></script>
 </html>
