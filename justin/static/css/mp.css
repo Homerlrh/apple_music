@@ -1,0 +1,20 @@
+body {
+	margin: 0;
+}
+
+.header_grid {
+	display: grid;
+	grid-template-columns: repeat(3, minmax(250px, 1fr));
+	grid-gap: 10px;
+	padding: 10px;
+	background-color: #2196f3;
+}
+
+.header_grid > div {
+	border: 1px solid black;
+}
+
+.music_player {
+	margin: auto;
+	width: 100%;
+}
