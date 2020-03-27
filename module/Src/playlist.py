@@ -1,21 +1,17 @@
 from .. import db
 
-
-class Album(db.Model):
-    __tablename__   = "album"
+class Playlist(db.Model):
+    __tablename__   = "playlist"
     __id            = db.Column(db.Integer, primary_key=True)
     cover_img       = db.Column(db.String(
         999), default="https://icons.iconarchive.com/icons/papirus-team/papirus-mimetypes/512/unknown-icon.png", unique=False, nullable=True)
     name            = db.Column(db.String(80), default="unknown",
                      unique=False, nullable=True)
-    author          = db.Column(db.String(80), default="unknown",
-                       unique=False, nullable=True)
-    genre           = db.Column(db.String(80), default="unknown",
-                      unique=False, nullable=True)
-    year            = db.Column(db.Integer, default=9999, unique=False, nullable=True)
-    like            = db.Column(db.Integer, default=0, unique=False, nullable=True)
+    user_id         = db.Column(db.Integer(), db.ForeignKey('user._User__.id'))
+    #mayebe other users can like other user playlists
+    #like            = db.Column(db.Integer, default=0, unique=False, nullable=True)
     #song can have many albums and albums can have many songs
-    Song_list       = db.relationship("Song", backref="Album")
+    Song_list       = db.relationship("Song", backref="Playlist")
 
     # def __repr__(self):
     #     return '<Album {}>'.format(f"Album id: {self.id} Album name: {self.name}")
