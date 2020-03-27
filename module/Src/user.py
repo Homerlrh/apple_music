@@ -14,5 +14,5 @@ class user(db.Model):
                               default=[], unique=False, nullable=True)
     created_date    = db.Column(DateTime, default=datetime.datetime.utcnow)
 
-def __repr__(self):
-        return '<User {}>'.format(self.name) 
+# def __repr__(self):
+#         return '<User {}>'.format(self.name) 

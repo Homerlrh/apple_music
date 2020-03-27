@@ -16,6 +16,6 @@ class Album(db.Model):
     like            = db.Column(db.Integer, default=0, unique=False, nullable=True)
     Song_list       = db.relationship("Song", backref="Album")
 
-    def __repr__(self):
-        return '<Album {}>'.format(f"Album id: {self.id} Album name: {self.name}")
+    # def __repr__(self):
+    #     return '<Album {}>'.format(f"Album id: {self.id} Album name: {self.name}")
 
