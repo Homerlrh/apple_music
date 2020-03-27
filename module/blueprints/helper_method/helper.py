@@ -11,37 +11,51 @@ class get_info:
 
     # get song
     def get_cover_art(self, artist, album):
-        cover_art = pylast.Album(artist, album, self.network).get_cover_image()
-        return cover_art
+        try:
+            return pylast.Album(artist, album, self.network).get_cover_image()
+        except pylast.WSError:
+            return None
+        except IndexError:
+            return None
 
     def get_style(self, artist, album):
         try:
             Album = pylast.Album(artist, album, self.network)
             Tag = Album.get_top_tags(limit=None)
             return Tag[0].item.name
-        except:
+        except IndexError:
             return None
 
     def get_date(self, artist, album):
         Album = pylast.Album(artist, album, self.network)
         data = Album.get_wiki_published_date()
+        print("date:  ", data)
         return data
 
     # track
     def get_song_cover(self, artist, album):
         try:
-            return pylast.Track(artist, album, self.network).get_cover_image()
-        except:
+            is_track = pylast.Track(artist, album, self.network)
+            return is_track.get_cover_image()
+        except pylast.WSError:
             return None
 
     def get_Track_date(self, artist, album):
-        Track = pylast.Track(artist, album, self.network)
-        data = Track.get_wiki_published_date()
-        return data
+        try:
+            Track = pylast.Track(artist, album, self.network)
+            data = Track.get_wiki_published_date()
+            return data
+        except pylast.WSError:
+            return None
+        except IndexError:
+            return None
 
     def get_duration(self, artist, album):
-        Track = pylast.Track(artist, album, self.network)
-        return millisToMinutesAndSeconds(Track.get_duration().real)
+        try:
+            Track = pylast.Track(artist, album, self.network)
+            return millisToMinutesAndSeconds(Track.get_duration().real)
+        except pylast.WSError:
+            return None
 
 
 def millisToMinutesAndSeconds(millis):

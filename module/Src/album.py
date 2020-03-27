@@ -7,7 +7,7 @@ class Album(db.Model):
     cover_img = db.Column(db.String(
         999), default="https://icons.iconarchive.com/icons/papirus-team/papirus-mimetypes/512/unknown-icon.png", unique=False, nullable=True)
     name = db.Column(db.String(80), default="unknow",
-                     unique=True, nullable=True)
+                     unique=False, nullable=True)
     author = db.Column(db.String(80), default="unknow",
                        unique=False, nullable=True)
     genre = db.Column(db.String(80), default="unknow",

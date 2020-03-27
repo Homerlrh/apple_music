@@ -44,7 +44,8 @@ def add_song():
     year = get_info.get_Track_date(data["artist"], data["name"])
     if data["album"] == None:
         data["album"] = "unknow"
-    belongs_to = Album.query.filter_by(name=data["album"]).first()
+    belongs_to = Album.query.filter_by(
+        name=data["album"]).filter_by(author=data["artist"]).first()
     if belongs_to:
         song = Song(url=data["Song_link"], img=img, alb_img=belongs_to.cover_img,
                     name=data["name"], author=data["artist"], album_id=belongs_to._Album__id, album=belongs_to.name, duration=time, lyrics=data["lyrics"], year=year)
@@ -64,12 +65,12 @@ def add_album():
     if data["name"] == None:
         data["name"] = "unknow"
         img_link = None
-    is_album = Album.query.filter_by(name=data["name"]).first()
-    if is_album:
-        return ("Album is already exist, please check again")
-    else:
-        add_song_function(
-            Album(cover_img=img_link, name=data["name"], author=data["artist"], genre=style, year=date))
+    # is_album = Album.query.filter_by(name=data["name"]).first()
+    # if is_album:
+    #     return ("Album is already exist, please check again")
+    # else:
+    add_song_function(Album(
+        cover_img=img_link, name=data["name"], author=data["artist"], genre=style, year=date))
     return redirect(url_for("users.get_all_album"))
 
 
@@ -97,6 +98,7 @@ def delete_song():
 def song_in_album():
     album_id = request.form["id"]
     song_in_album = db.session.query(Song).filter_by(album_id=album_id).all()
+    print(song_in_album.__len__())
     return render_template("player.html", song=song_in_album)
 
 
@@ -104,6 +106,7 @@ def song_in_album():
 def delete_album():
     data = request.form
     db.session.query(Album).filter_by(_Album__id=data["id"]).delete()
+    db.session.query(Song).filter_by(album_id=data["id"]).delete()
     db.session.commit()
     return redirect(url_for("users.get_all_album"))
 
