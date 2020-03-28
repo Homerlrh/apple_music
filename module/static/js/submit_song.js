@@ -26,7 +26,9 @@ Dropzone.options.myAwesomeDropzone = {
 		thisDropzone = this;
 		this.on("success", (file, responseText) => {
 			alert("File is successfully submit");
-			$("#song_src").val(responseText);
+			$("#song_src").val(responseText["url"]);
+			$("#duration").val(responseText["time"]);
+			$("#song_name").val(responseText["name"]);
 		});
 	},
 };

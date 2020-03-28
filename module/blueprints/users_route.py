@@ -6,6 +6,8 @@ from .helper_method.helper import get_info
 import boto3
 import pylast
 import os
+from mutagen.mp3 import MP3
+
 
 users = Blueprint("users", __name__)
 get_info = get_info()
@@ -40,19 +42,19 @@ def get_song_detail():
 def add_song():
     data = change_to_default(request.form)
     img = get_info.get_song_cover(data["artist"], data["name"])
-    time = get_info.get_duration(data["artist"], data["name"])
     year = get_info.get_Track_date(data["artist"], data["name"])
-    if data["album"] == None:
-        data["album"] = "unknow"
+    lyrics = get_info.get_lyrics(data["artist"], data["name"])
     belongs_to = Album.query.filter_by(
         name=data["album"]).filter_by(author=data["artist"]).first()
     if belongs_to:
         song = Song(url=data["Song_link"], img=img, alb_img=belongs_to.cover_img,
-                    name=data["name"], author=data["artist"], album_id=belongs_to._Album__id, album=belongs_to.name, duration=time, lyrics=data["lyrics"], year=year)
+                    name=data["name"], author=data["artist"], album_id=belongs_to._Album__id, album=belongs_to.name, duration=data["duration"], lyrics=lyrics, year=year)
         add_song_function(song)
-        return redirect(url_for("users.get_all_song"))
     else:
-        return ("it seems like there is not ablum for it, please add the album first")
+        song = Song(url=data["Song_link"], img=img, alb_img=None,
+                    name=data["name"], author=data["artist"], album_id=None, album=None, duration=data["duration"], lyrics=lyrics, year=year)
+        add_song_function(song)
+    return redirect(url_for("users.get_all_song"))
 
 
 @users.route("/user/addalbum", methods=["post"])
@@ -61,7 +63,10 @@ def add_album():
     img_link = get_info.get_cover_art(data["artist"], data["name"])
     date = get_info.get_date(data["artist"], data["name"])
     style = get_info.get_style(data["artist"], data["name"])
-    print(style)
+    if date != None:
+        date = date.split(",")[0]
+    # print(get_info.tryout())
+    # return get_info.tryout()
     if data["name"] == None:
         data["name"] = "unknow"
         img_link = None
@@ -77,10 +82,19 @@ def add_album():
 @users.route("/user/updatesong", methods=["post"])
 def update_song():
     data = request.form
+    is_album = db.session.query(Album).filter_by(name=data["Album"]).first()
+    if is_album:
+        a_id = is_album._Album__id
+        img = is_album.cover_img
+    else:
+        a_id = None
+        img = None
     stmt = {"name": data["name"],
             "author": data["author"],
+            "album_id": a_id,
             "album": data["Album"],
-            "lyrics": data["lyrics"]}
+            "lyrics": data["lyrics"],
+            "alb_img": img}
     db.session.query(Song).filter_by(_Song__id=data["id"]).update(stmt)
     db.session.commit()
     return ("Song successfully update")
@@ -106,7 +120,7 @@ def song_in_album():
 def delete_album():
     data = request.form
     db.session.query(Album).filter_by(_Album__id=data["id"]).delete()
-    db.session.query(Song).filter_by(album_id=data["id"]).delete()
+    # db.session.query(Song).filter_by(album_id=data["id"]).delete()
     db.session.commit()
     return redirect(url_for("users.get_all_album"))
 
@@ -127,9 +141,15 @@ def upload():
         if allow_file(f.filename):
             # path = os.path.join(current_app.config["IMG_UPLOAD"], f.filename)
             # f.save(path)
+            print(f.filename)
+            audio = MP3(f)
+            duration = get_info.get_duration_2(audio.info.length)
+            name = f.filename.split(".")[0]
             s3 = boto3.resource("s3")
             s3.Bucket("apple-clone").put_object(Key=f.filename, Body=f)
-            return f"https://apple-clone.s3-us-west-2.amazonaws.com/{f.filename}"
+            info = {
+                "time": duration, "url": f"https://apple-clone.s3-us-west-2.amazonaws.com/{f.filename}", "name": name}
+            return info
         else:
             return "Type is not supported, submit another one", 400
 

@@ -7,15 +7,18 @@ class Song(db.Model):
     url = db.Column(db.String(999), unique=False, nullable=False)
     img = db.Column(db.String(
         999), default="https://icons.iconarchive.com/icons/papirus-team/papirus-mimetypes/512/unknown-icon.png", unique=False, nullable=True)
-    alb_img = db.Column(db.String(999), unique=False, nullable=True)
-    name = db.Column(db.String(80), default="unknow",
+    alb_img = db.Column(db.String(
+        999), default="https://cdn3.iconfinder.com/data/icons/iconic-1/32/x_alt-512.png", unique=False, nullable=True)
+    name = db.Column(db.String(80), default="unknown",
                      unique=False, nullable=True)
-    author = db.Column(db.String(80), default="unknow",
+    author_id = db.Column(db.String(80), default="unknown",
+                          unique=False, nullable=True)
+    author = db.Column(db.String(80), default="unknown",
                        unique=False, nullable=True)
     album_id = db.Column(db.Integer, db.ForeignKey('album._Album__id'),
-                         nullable=False)
-    album = db.Column(db.String(80), default="unknow")
-    duration = db.Column(db.String(25), default="0:0.0",
+                         nullable=True)
+    album = db.Column(db.String(80), default="n/a")
+    duration = db.Column(db.String(25), default="0:0",
                          unique=False, nullable=True)
     lyrics = db.Column(db.String(888888), default="unknown",
                        unique=False, nullable=True)
@@ -23,4 +26,4 @@ class Song(db.Model):
     like = db.Column(db.Integer, default=0, unique=False, nullable=True)
 
     # def __repr__(self):
-    #     return '<User %r>' % self.id
+    #     return '<User %r>' % self.name
