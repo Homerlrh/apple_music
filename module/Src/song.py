@@ -11,6 +11,8 @@ class Song(db.Model):
         999), default="https://cdn3.iconfinder.com/data/icons/iconic-1/32/x_alt-512.png", unique=False, nullable=True)
     name = db.Column(db.String(80), default="unknown",
                      unique=False, nullable=True)
+    genre = db.Column(db.String(80), default="unknown",
+                      unique=False, nullable=True)
     author_id = db.Column(db.String(80), default="unknown",
                           unique=False, nullable=True)
     author = db.Column(db.String(80), default="unknown",

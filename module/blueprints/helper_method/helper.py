@@ -33,6 +33,7 @@ class get_info:
     def get_date(self, artist, album):
         # try:
         Album = pylast.Album(artist, album, self.network)
+        print(Album.__dir__())
         data = Album.get_wiki_published_date()
         print("date:  ", data)
         return data
@@ -50,7 +51,7 @@ class get_info:
         except IndexError:
             return None
 
-    def get_Track_date(self, artist, album):
+    def get_song_date(self, artist, album):
         try:
             Track = pylast.Track(artist, album, self.network)
             data = Track.get_wiki_published_date()

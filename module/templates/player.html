@@ -24,7 +24,7 @@
 					<!-- <source src="#" type="audio/ogg" />-->
 					<source
 						id="source_link"
-						src="https://apple-clone.s3-us-west-2.amazonaws.com/AGA - 圆.mp3"
+						src="https://d39wlfkh0mxxlz.cloudfront.net/Maroon%2B5-Sugar.mp3"
 						type="audio/mpeg"
 					/>
 				</audio>
@@ -43,6 +43,7 @@
 					include './partial/Song_model.html' %} {%endif%}
 				</div>
 				<div class="d-flex justify-content-center">
+					<form></form>
 					<form
 						id="select_form"
 						action="/user/select_form"
@@ -111,6 +112,16 @@
 						/>
 					</div>
 					<div class="form-group">
+						<label for="{{detail.genre}}">Genre</label>
+						<input
+							type="text"
+							name="genre"
+							class="form-control"
+							id="{{detail.genre}}"
+							value="{{detail.genre}}"
+						/>
+					</div>
+					<div class="form-group">
 						<label for="{{detail.lyrics}}">Lyrics</label>
 						<textarea
 							class="form-control"
@@ -131,6 +142,7 @@
 						<th>Artist</th>
 						<th>Albums</th>
 						<th>Duration</th>
+						<th>Genre</th>
 						<th>Likes</th>
 						<th>Action</th>
 					</tr>
@@ -145,6 +157,7 @@
 							{{x.album}}
 						</td>
 						<td>{{x.duration}}</td>
+						<td>{{x.genre}}</td>
 						<td>{{x.likes}}</td>
 						<td class="form_input d-flex justify-content-between">
 							<form
@@ -240,7 +253,45 @@
 	</body>
 	{% include './partial/jq.html' %}
 	<script src="{{ url_for('static',filename='js/detail_request.js') }}"></script>
-	{{ dropzone.load_js() }}{{ dropzone.config(max_files=1, timeout=10000,
-	default_message='Drop here!') }}
+	{{ dropzone.load_js() }}
+	<script type="module">
+		import * as id3 from "https://unpkg.com/id3js@^2/lib/id3.js";
+		Dropzone.options.myDropzone = {
+			paramName: "file",
+			maxFilesize: 1000,
+			maxFiles: 1,
+			addRemoveLinks: true,
+			autoProcessQueue: false, // dont auto upload
+			init: function() {
+				const submitButton = document.querySelector("#trigger_button"),
+					myDropzone = this;
+				submitButton.addEventListener("click", function() {
+					myDropzone.processQueue(); // Tell Dropzone to process all queued files.
+				});
+
+				//fill in input space when file is added
+				this.on("addedfile", async (file) => {
+					const tags = await id3.fromFile(file);
+					await $("#album").val(tags.album);
+					await $("#artist").val(tags.artist);
+					await $("#song_name").val(tags.title);
+				});
+
+				//clear input file when the file is remove
+				this.on("removedfile", async () => {
+					alert("File remove");
+					await $("#album").val("");
+					await $("#artist").val("");
+					await $("#song_name").val("");
+				});
+
+				this.on("success", async (file, responseText) => {
+					await $("#song_src").val(responseText["url"]);
+					await $("#duration").val(responseText["time"]);
+					$("#add_song").submit();
+				});
+			},
+		};
+	</script>
 	<script src="{{ url_for('static',filename='js/submit_song.js') }}"></script>
 </html>

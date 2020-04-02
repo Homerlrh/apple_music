@@ -30,11 +30,16 @@
 				</button>
 			</div>
 			<div class="modal-body text-black of">
+				<span
+					>Upload song {{ dropzone.create(action='/user/song_upload') }}
+				</span>
+				<hr />
 				<form
 					id="add_song"
 					style="margin-top: 10px;"
 					method="POST"
 					action="/user/addsong"
+					enctype="multipart/form-data"
 				>
 					<div class="form-group">
 						<label for="">Name</label>
@@ -46,7 +51,7 @@
 							id="song_name"
 						/>
 					</div>
-					<div class="form-group">
+					<div class="form-group" hidden>
 						<label for="">Song link</label>
 						<input
 							type="url"
@@ -57,6 +62,16 @@
 						/>
 					</div>
 					<div class="form-group">
+						<label for="">Genre</label>
+						<input
+							type="text"
+							class="form-control"
+							name="genre"
+							id="genre"
+							value=""
+						/>
+					</div>
+					<div class="form-group" hidden>
 						<label for="">Duration</label>
 						<input
 							type="text"
@@ -68,11 +83,23 @@
 					</div>
 					<div class="form-group">
 						<label for="">Artist</label>
-						<input type="text" class="form-control" name="artist" value="" />
+						<input
+							type="text"
+							class="form-control"
+							name="artist"
+							value=""
+							id="artist"
+						/>
 					</div>
 					<div class="form-group">
 						<label for="">Album</label>
-						<input type="text" class="form-control" name="album" value="" />
+						<input
+							type="text"
+							class="form-control"
+							name="album"
+							value=""
+							id="album"
+						/>
 					</div>
 					<div class="form-group" hidden>
 						<label for="">Lyrics</label>
@@ -85,25 +112,12 @@
 						></textarea>
 					</div>
 				</form>
-				<span
-					>Upload song
-					<form
-						action="/user/img_upload"
-						class="dropzone"
-						id="my-awesome-dropzone"
-					></form
-				></span>
 			</div>
 			<div class="modal-footer">
 				<button type="button" class="btn btn-secondary" data-dismiss="modal">
 					Close
 				</button>
-				<button
-					type="submit"
-					class="btn btn-primary"
-					id="trigger_button"
-					form="add_song"
-				>
+				<button type="submit" class="btn btn-primary" id="trigger_button">
 					Add
 				</button>
 			</div>

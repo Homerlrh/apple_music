@@ -8,7 +8,6 @@ import pylast
 import os
 from mutagen.mp3 import MP3
 
-
 users = Blueprint("users", __name__)
 get_info = get_info()
 
@@ -40,9 +39,11 @@ def get_song_detail():
 
 @users.route("/user/addsong", methods=["post"])
 def add_song():
+    print(request.form)
     data = change_to_default(request.form)
+    print(data)
     img = get_info.get_song_cover(data["artist"], data["name"])
-    year = get_info.get_Track_date(data["artist"], data["name"])
+    year = get_info.get_song_date(data["artist"], data["name"])
     lyrics = get_info.get_lyrics(data["artist"], data["name"])
     belongs_to = Album.query.filter_by(
         name=data["album"]).filter_by(author=data["artist"]).first()
@@ -88,10 +89,11 @@ def update_song():
         img = is_album.cover_img
     else:
         a_id = None
-        img = None
+        img = 'https://cdn3.iconfinder.com/data/icons/iconic-1/32/x_alt-512.png'
     stmt = {"name": data["name"],
             "author": data["author"],
             "album_id": a_id,
+            "genre": data["genre"],
             "album": data["Album"],
             "lyrics": data["lyrics"],
             "alb_img": img}
@@ -134,21 +136,19 @@ def Body_change():
         return redirect(url_for("users.get_all_album"))
 
 
-@users.route("/user/img_upload", methods=["POST"])
+@users.route("/user/song_upload", methods=["POST"])
 def upload():
     if request.files:
-        f = request.files.get('file')
+        f = request.files['file']
         if allow_file(f.filename):
-            # path = os.path.join(current_app.config["IMG_UPLOAD"], f.filename)
-            # f.save(path)
-            print(f.filename)
             audio = MP3(f)
             duration = get_info.get_duration_2(audio.info.length)
-            name = f.filename.split(".")[0]
             s3 = boto3.resource("s3")
             s3.Bucket("apple-clone").put_object(Key=f.filename, Body=f)
             info = {
-                "time": duration, "url": f"https://apple-clone.s3-us-west-2.amazonaws.com/{f.filename}", "name": name}
+                "time": duration,
+                "url": f"https://d39wlfkh0mxxlz.cloudfront.net/{f.filename}",
+            }
             return info
         else:
             return "Type is not supported, submit another one", 400
