@@ -9,6 +9,7 @@ class Playlist(db.Model):
         999), default="https://icons.iconarchive.com/icons/papirus-team/papirus-mimetypes/512/unknown-icon.png", unique=False, nullable=True)
     name = db.Column(db.String(80), default="unknown",
                      unique=False, nullable=True)
+
     user_id = db.Column(db.Integer(), db.ForeignKey('user._User__.id'))
     # mayebe other users can like other user playlists
     #like = db.Column(db.Integer, default=0, unique=False, nullable=True)
