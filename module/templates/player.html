@@ -77,6 +77,7 @@
 				</div>
 				<div class="col-sm-4"></div>
 			</section>
+
 			{% if detail%}
 			<section class="music_container" style="width: 85%; margin: 30px auto;">
 				<form id="update_form" style="margin-top: 10px;">
@@ -136,7 +137,9 @@
 					<input type="submit" class="btn btn-success" value="update" />
 				</form>
 			</section>
+
 			{%elif song%}
+			<h1>Song panel</h1>
 			<section
 				class="music_container row"
 				style="width: 85%; margin: 30px auto;"
@@ -203,11 +206,13 @@
 				{% endfor %}
 			</section>
 
+			{%elif album%}
+			<h1>Album panel</h1>
 			<section
 				class="music_container row"
 				style="width: 85%; margin: 30px auto;"
 			>
-				{%elif album%}{% for x in album%}
+				{% for x in album%}
 				<div class="col-sm-4" style="margin-top:20px;">
 					<div class="rounded text-dark ">
 						<div class="flip-card" style="margin: auto;">
@@ -268,24 +273,24 @@
 						</div>
 					</div>
 				</div>
-
-				{% endfor %} {% endif %}
+				{% endfor %}
 			</section>
+			{% endif %}
 		</main>
+
 		<footer class="bottom">
 			<div class="wrapper"></div>
 			<audio controls id="music_player">
-				<source
-					id="source_link"
-					src="https://d39wlfkh0mxxlz.cloudfront.net/Maroon%2B5-Sugar.mp3"
-					type="audio/mpeg"
-				/>
+				<source id="source_link" src="" type="audio/mpeg" />
 			</audio>
 		</footer>
 	</body>
 	{% include './partial/jq.html' %}
+
 	<script src="{{ url_for('static',filename='js/detail_request.js') }}"></script>
+
 	{{ dropzone.load_js() }}
+
 	<script type="module">
 		import * as id3 from "https://unpkg.com/id3js@^2/lib/id3.js";
 		Dropzone.options.myDropzone = {

@@ -40,15 +40,16 @@ def add_song():
     img = get_info.get_song_cover(data["artist"], data["name"])
     year = get_info.get_song_date(data["artist"], data["name"])
     lyrics = get_info.get_lyrics(data["artist"], data["name"])
-    # belongs_to = Album.query.filter_by(
-    #     name=data["album"]).filter_by(author=data["artist"]).first()
-    # if belongs_to:
-    #     song = Song(url=data["Song_link"], img=img, alb_img=belongs_to.cover_img,
-    #                 name=data["name"], author=data["artist"], album_id=belongs_to._Album__id, album=belongs_to.name, duration=data["duration"], lyrics=lyrics, year=year)
-    #     add_song_function(song)
-    # else:
-    song = Song(url=data["Song_link"], img=img, name=data["name"], author=data["artist"],
-                album=data["album"], duration=data["duration"], lyrics=lyrics, year=year)
+    song = Song(
+        url=data["Song_link"],
+        img=img,
+        name=data["name"],
+        author=data["artist"],
+        album=data["album"],
+        duration=data["duration"],
+        lyrics=lyrics,
+        year=year
+    )
     add_song_function(song)
     return redirect(url_for("users.get_all_song"))
 
@@ -61,15 +62,9 @@ def add_album():
     style = get_info.get_style(data["artist"], data["name"])
     if date != None:
         date = date.split(",")[0]
-    # print(get_info.tryout())
-    # return get_info.tryout()
     if data["name"] == None:
         data["name"] = "unknow"
         img_link = None
-    # is_album = Album.query.filter_by(name=data["name"]).first()
-    # if is_album:
-    #     return ("Album is already exist, please check again")
-    # else:
     add_song_function(Album(
         cover_img=img_link, name=data["name"], author=data["artist"], genre=style, year=date))
     return redirect(url_for("users.get_all_album"))
@@ -79,19 +74,12 @@ def add_album():
 def update_song():
     data = request.form
     is_album = db.session.query(Album).filter_by(name=data["Album"]).first()
-    if is_album:
-        a_id = is_album._Album__id
-        img = is_album.cover_img
-    else:
-        a_id = None
-        img = 'https://cdn3.iconfinder.com/data/icons/iconic-1/32/x_alt-512.png'
     stmt = {"name": data["name"],
             "author": data["author"],
-            "album_id": a_id,
             "genre": data["genre"],
             "album": data["Album"],
             "lyrics": data["lyrics"],
-            "alb_img": img}
+            }
     db.session.query(Song).filter_by(_Song__id=data["id"]).update(stmt)
     db.session.commit()
     return ("Song successfully update")
@@ -122,8 +110,6 @@ def add_in_album():
         Song).filter_by(name=song, author=artist).first()
     alb.Song_list.append(song_in_album)
     db.session.commit()
-    alb = db.session.query(Album).filter_by(_Album__id=album_id).first()
-
     return render_template("player.html", song=alb.Song_list, add_song_to_album=album_id)
 
 
@@ -131,7 +117,6 @@ def add_in_album():
 def delete_album():
     data = request.form
     db.session.query(Album).filter_by(_Album__id=data["id"]).delete()
-    # db.session.query(Song).filter_by(album_id=data["id"]).delete()
     db.session.commit()
     return redirect(url_for("users.get_all_album"))
 
