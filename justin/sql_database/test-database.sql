@@ -6,6 +6,8 @@ DROP TABLE IF EXISTS album_songs;
 DROP TABLE IF EXISTS album_user_likes;
 DROP TABLE IF EXISTS artist_albums;
 DROP TABLE IF EXISTS albums;
+DROP TABLE IF EXISTS user_favorite_songs;
+DROP TABLE IF EXISTS song_user_likes;
 DROP TABLE IF EXISTS songs;
 DROP TABLE IF EXISTS artist_songs;
 DROP TABLE IF EXISTS artists;
@@ -13,10 +15,10 @@ DROP TABLE IF EXISTS users;
 
 CREATE TABLE users (
     _id           INTEGER PRIMARY KEY,
-    `name`        TEXT NOT NULL,
     email         TEXT NOT NULL,
+    password_hash    TEXT NOT NULL
+    `name`        TEXT NOT NULL,
     date_of_birth TEXT NOT NULL,
-    `password`    TEXT NOT NULL
 );
 
 CREATE TABLE artists (
@@ -42,6 +44,22 @@ CREATE TABLE songs (
     likes       INTEGER
 );
 
+CREATE TABLE song_user_likes (
+    _id         INTEGER PRIMARY KEY,
+    song_id    INTEGER,
+    user_id     INTEGER,
+    FOREIGN KEY (song_id) REFERENCES song(_id),
+    FOREIGN KEY (user_id) REFERENCES users(_id)
+);
+
+CREATE TABLE user_favorite_songs (
+    _id           INTEGER PRIMARY KEY,
+    user_id       INTEGER,
+    song_id         INTEGER,
+    FOREIGN KEY (song_id) REFERENCES songs(_id),
+    FOREIGN KEY (user_id) REFERENCES users(_id)
+);
+
 CREATE TABLE albums (
     _id         INTEGER PRIMARY KEY,
     cover_image TEXT,
@@ -55,7 +73,7 @@ CREATE TABLE artist_albums (
     _id         INTEGER PRIMARY KEY,
     artist_id       INTEGER,
     album_id    INTEGER,
-    FOREIGN KEY (album_id) REFERENCES albums(id),
+    FOREIGN KEY (album_id) REFERENCES albums(_id),
     FOREIGN KEY (artist_id) REFERENCES artists(_id)
 );
 
@@ -64,7 +82,7 @@ CREATE TABLE album_user_likes (
     _id         INTEGER PRIMARY KEY,
     album_id    INTEGER,
     user_id     INTEGER,
-    FOREIGN KEY (album_id) REFERENCES albums(id),
+    FOREIGN KEY (album_id) REFERENCES albums(_id),
     FOREIGN KEY (user_id) REFERENCES users(_id)
 );
 
@@ -74,7 +92,7 @@ CREATE TABLE album_songs(
     album_id    INTEGER,
     song_id     INTEGER,
     FOREIGN KEY (song_id) REFERENCES songs(_id),
-    FOREIGN KEY (album_id) REFERENCES albums(id)
+    FOREIGN KEY (album_id) REFERENCES albums(_id)
 );
 
 CREATE TABLE lyrics (

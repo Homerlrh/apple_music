@@ -19,11 +19,11 @@ def select_songs(select_by = '*', search_by = ''):
         return cursor.fetchall()
 
 def insert_song_into_songs(title, artist, duration, release_year):
+    table = songs
     connection = sqlite3.connect(database)
     cursor = connection.cursor()
-    likes = 0 #set likes to 
     with connection:
-        cursor.execute("INSERT INTO songs (title, artist, duration, release_year, likes) VALUES (?, ?, ?, ?, ?)", (title, artist, duration, release_year, likes))
+        cursor.execute(f"INSERT INTO {table} (title, artist, duration, release_year) VALUES (?, ?, ?, ?)", (title, artist, duration, release_year))
 
 #insert_song_into_songs("Pick Me Up", "Perfume", 4, 2014)
 #insert_song_into_songs("Future Pop", "Perfume", 4, 2018)
@@ -41,6 +41,15 @@ def select_users(select_by = '*', search_by = ''):
         cursor.execute(f"SELECT {select_by} FROM {table} {search_by}")
         return cursor.fetchall()
 
+def insert_user_into_users(email, password_hash, name, date_of_birth):
+    table = users
+    connection = sqlite3.connect(database)
+    cursor = connection.cursor()
+    likes = 0 #set likes to 
+    with connection:
+        cursor.execute(f"INSERT INTO {table} (email, password_hash, name, date_of_birth) VALUES (?, ?, ?, ?)", (email, password_hash, name, date_of_birth))
+
+
 #artists
 def select_users(select_by = '*', search_by = ''):
     table = artists
@@ -49,6 +58,10 @@ def select_users(select_by = '*', search_by = ''):
     with connection:
         cursor.execute(f"SELECT {select_by} FROM {table} {search_by}")
         return cursor.fetchall()
+
+
+
+
 
 #artist_songs
 def select_users(select_by = '*', search_by = ''):
@@ -63,6 +76,25 @@ def select_users(select_by = '*', search_by = ''):
 
 #songs up there
 
+
+#song_user_likes
+def select_users(select_by = '*', search_by = ''):
+    table = song_user_likes
+    connection = sqlite3.connect(database)
+    cursor = connection.cursor()
+    with connection:
+        cursor.execute(f"SELECT {select_by} FROM {table} {search_by}")
+        return cursor.fetchall()
+
+
+#user_favorite_songs
+def select_users(select_by = '*', search_by = ''):
+    table = user_favorite_songs
+    connection = sqlite3.connect(database)
+    cursor = connection.cursor()
+    with connection:
+        cursor.execute(f"SELECT {select_by} FROM {table} {search_by}")
+        return cursor.fetchall()
 
 #albums
 def select_users(select_by = '*', search_by = ''):
