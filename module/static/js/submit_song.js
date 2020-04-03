@@ -2,7 +2,7 @@ $("#img_upl").submit(function(e) {
 	e.preventDefault();
 	var form = new FormData($("#img_upl")[0]);
 	$.ajax({
-		url: "/user/img_upload",
+		url: "/user/song_upload",
 		method: "POST",
 		data: form,
 		processData: false,
@@ -15,18 +15,3 @@ $("#img_upl").submit(function(e) {
 		},
 	});
 });
-
-const myDropzone = $("#mydropzone");
-myDropzone.on("success", function(file) {
-	console.log("hi");
-});
-
-Dropzone.options.myAwesomeDropzone = {
-	init: function() {
-		thisDropzone = this;
-		this.on("success", function(file, responseText) {
-			alert(responseText);
-			$("#song_src").val(responseText);
-		});
-	},
-};
