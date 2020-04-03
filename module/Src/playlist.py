@@ -9,7 +9,7 @@ class Playlist(db.Model):
                      unique=False, nullable=True)
     user_id         = db.Column(db.Integer(), db.ForeignKey('user._User__.id'))
     #mayebe other users can like other user playlists
-    #like            = db.Column(db.Integer, default=0, unique=False, nullable=True)
+    #like           = db.Column(db.Integer, default=0, unique=False, nullable=True)
     #song can have many albums and albums can have many songs
     Song_list       = db.relationship("Song", backref="Playlist")
 
