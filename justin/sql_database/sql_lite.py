@@ -3,7 +3,7 @@ from flask import Flask
 from flask import g
 app = Flask(__name__)
 
-DATABASE = 'test-db.db'
+DATABASE = 'orange-music.db'
 
 def get_db():
     db = getattr(g, '_database', None)
@@ -38,7 +38,7 @@ def close_connection(exception):
 
 
 #imports schema.sql
-init_db() 
+#init_db() 
 
 #select query
 # for user in query_db('select * from users'):
