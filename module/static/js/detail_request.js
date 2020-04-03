@@ -31,5 +31,6 @@ $(function() {
 	});
 	$(".change[name=options]").change(function() {
 		$("#select_form").submit();
+		console.log("hji");
 	});
 });

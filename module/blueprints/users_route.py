@@ -2,10 +2,11 @@ from flask import Blueprint, render_template, request, url_for, redirect, curren
 from .. import db
 from ..Src.album import Album
 from ..Src.song import Song
-import pylast
-import os
 from .helper_method.helper import get_info
 import boto3
+import pylast
+import os
+from mutagen.mp3 import MP3
 
 users = Blueprint("users", __name__)
 get_info = get_info()
@@ -14,7 +15,6 @@ get_info = get_info()
 @users.route("/user/Song", methods=["get"])
 def get_all_song():
     all_song = Song.query.all()
-    print(all_song)
     if(all_song):
         return render_template("player.html", song=all_song, s="a")
     else:
@@ -24,7 +24,6 @@ def get_all_song():
 @users.route("/user/album", methods=["get"])
 def get_all_album():
     all_album = Album.query.all()
-    print(all_album)
     return render_template("player.html", album=all_album, a="s")
 
 
@@ -32,26 +31,27 @@ def get_all_album():
 def get_song_detail():
     data = request.form
     detail_song = Song.query.filter_by(_Song__id=data["id"]).first()
-    print(detail_song)
     return render_template("player.html", detail=detail_song)
 
 
 @users.route("/user/addsong", methods=["post"])
 def add_song():
-    data = change_to_default(request.form)
+    data = change_to_default(request.form)  # if '' return none
     img = get_info.get_song_cover(data["artist"], data["name"])
-    time = get_info.get_duration(data["artist"], data["name"])
-    year = get_info.get_Track_date(data["artist"], data["name"])
-    if data["album"] == None:
-        data["album"] = "unknow"
-    belongs_to = Album.query.filter_by(name=data["album"]).first()
-    if belongs_to:
-        song = Song(url=data["Song_link"], img=img, alb_img=belongs_to.cover_img,
-                    name=data["name"], author=data["artist"], album_id=belongs_to._Album__id, album=belongs_to.name, duration=time, lyrics=data["lyrics"], year=year)
-        add_song_function(song)
-        return redirect(url_for("users.get_all_song"))
-    else:
-        return ("it seems like there is not ablum for it, please add the album first")
+    year = get_info.get_song_date(data["artist"], data["name"])
+    lyrics = get_info.get_lyrics(data["artist"], data["name"])
+    song = Song(
+        url=data["Song_link"],
+        img=img,
+        name=data["name"],
+        author=data["artist"],
+        album=data["album"],
+        duration=data["duration"],
+        lyrics=lyrics,
+        year=year
+    )
+    add_song_function(song)
+    return redirect(url_for("users.get_all_song"))
 
 
 @users.route("/user/addalbum", methods=["post"])
@@ -60,26 +60,26 @@ def add_album():
     img_link = get_info.get_cover_art(data["artist"], data["name"])
     date = get_info.get_date(data["artist"], data["name"])
     style = get_info.get_style(data["artist"], data["name"])
-    print(style)
+    if date != None:
+        date = date.split(",")[0]
     if data["name"] == None:
         data["name"] = "unknow"
         img_link = None
-    is_album = Album.query.filter_by(name=data["name"]).first()
-    if is_album:
-        return ("Album is already exist, please check again")
-    else:
-        add_song_function(
-            Album(cover_img=img_link, name=data["name"], author=data["artist"], genre=style, year=date))
+    add_song_function(Album(
+        cover_img=img_link, name=data["name"], author=data["artist"], genre=style, year=date))
     return redirect(url_for("users.get_all_album"))
 
 
 @users.route("/user/updatesong", methods=["post"])
 def update_song():
     data = request.form
+    is_album = db.session.query(Album).filter_by(name=data["Album"]).first()
     stmt = {"name": data["name"],
             "author": data["author"],
+            "genre": data["genre"],
             "album": data["Album"],
-            "lyrics": data["lyrics"]}
+            "lyrics": data["lyrics"],
+            }
     db.session.query(Song).filter_by(_Song__id=data["id"]).update(stmt)
     db.session.commit()
     return ("Song successfully update")
@@ -93,11 +93,24 @@ def delete_song():
     return redirect(url_for("users.get_all_song"))
 
 
-@users.route("/user/all_song_in_album", methods=['post'])
+@users.route("/user/song_in_album", methods=['post'])
 def song_in_album():
     album_id = request.form["id"]
-    song_in_album = db.session.query(Song).filter_by(album_id=album_id).all()
-    return render_template("player.html", song=song_in_album)
+    alb = db.session.query(Album).filter_by(_Album__id=album_id).first()
+    return render_template("player.html", song=alb.Song_list, add_song_to_album=album_id)
+
+
+@users.route("/user/add_song_in_album", methods=['post'])
+def add_in_album():
+    album_id = request.form["album_id"]
+    artist = request.form["artist"]
+    song = request.form["name"]
+    alb = db.session.query(Album).filter_by(_Album__id=album_id).first()
+    song_in_album = db.session.query(
+        Song).filter_by(name=song, author=artist).first()
+    alb.Song_list.append(song_in_album)
+    db.session.commit()
+    return render_template("player.html", song=alb.Song_list, add_song_to_album=album_id)
 
 
 @users.route("/user/delete_album", methods=['post'])
@@ -117,18 +130,22 @@ def Body_change():
         return redirect(url_for("users.get_all_album"))
 
 
-@users.route("/user/img_upload", methods=["POST"])
+@users.route("/user/song_upload", methods=["POST"])
 def upload():
     if request.files:
-        f = request.files.get('file')
+        f = request.files['file']
         if allow_file(f.filename):
-            # path = os.path.join(current_app.config["IMG_UPLOAD"], f.filename)
-            # f.save(path)
+            audio = MP3(f)
+            duration = get_info.get_duration_2(audio.info.length)
             s3 = boto3.resource("s3")
             s3.Bucket("apple-clone").put_object(Key=f.filename, Body=f)
-            return f"https://apple-clone.s3-us-west-2.amazonaws.com/{f.filename}"
+            info = {
+                "time": duration,
+                "url": f"https://d39wlfkh0mxxlz.cloudfront.net/{f.filename}",
+            }
+            return info
         else:
-            return "image type is not supported, submit another one", 400
+            return "Type is not supported, submit another one", 400
 
 
 def add_song_function(song):

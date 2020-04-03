@@ -17,12 +17,14 @@ def create_app():
     app = Flask(__name__, template_folder="templates")
     app.config["SECRET_KEY"] = os.getenv("S_K")
     app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv("DB_uri")
-    app.config["IMG_UPLOAD"] = "module\static\img"
+    # app.config["IMG_UPLOAD"] = "module\static\img"
     db.init_app(app)
     Bootstrap(app)
     dropzone = Dropzone(app)
+
     from .blueprints.index_route import main
     app.register_blueprint(main)
+
     from .blueprints.users_route import users
     app.register_blueprint(users)
     with app.test_request_context():
