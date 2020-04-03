@@ -41,7 +41,6 @@ CREATE TABLE songs (
     artist_id   INTEGER,
     duration    REAL NOT NULL,
     release_year TEXT NOT NULL,
-    likes       INTEGER
 );
 
 CREATE TABLE song_user_likes (
@@ -62,10 +61,10 @@ CREATE TABLE user_favorite_songs (
 
 CREATE TABLE albums (
     _id         INTEGER PRIMARY KEY,
-    cover_image TEXT,
     title       TEXT,
     genre       TEXT,
     release_year TEXT,
+    cover_image TEXT
 );
 
 --artists have many albums and albums with the same name could be re-recorded/reproduced by another artist
