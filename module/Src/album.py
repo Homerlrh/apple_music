@@ -1,4 +1,5 @@
 from .. import db
+from .album_songs import Album_Songs
 
 
 class Album(db.Model):
@@ -16,7 +17,8 @@ class Album(db.Model):
                      unique=False, nullable=True)
     like = db.Column(db.Integer, default=0, unique=False, nullable=True)
     # song can have many albums and albums can have many songs
-    Song_list = db.relationship("Song", backref="Album")
+    Song_list = db.relationship(
+        "Song", secondary=Album_Songs, backref=db.backref("song_list", lazy='dynamic'))
 
     # def __repr__(self):
     #     return '<Album {}>'.format(f"Album id: {self.id} Album name: {self.name}")

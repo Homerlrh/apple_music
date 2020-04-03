@@ -21,8 +21,10 @@ def create_app():
     db.init_app(app)
     Bootstrap(app)
     dropzone = Dropzone(app)
+
     from .blueprints.index_route import main
     app.register_blueprint(main)
+
     from .blueprints.users_route import users
     app.register_blueprint(users)
     with app.test_request_context():

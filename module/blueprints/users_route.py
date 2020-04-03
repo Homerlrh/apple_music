@@ -15,7 +15,6 @@ get_info = get_info()
 @users.route("/user/Song", methods=["get"])
 def get_all_song():
     all_song = Song.query.all()
-    print(all_song)
     if(all_song):
         return render_template("player.html", song=all_song, s="a")
     else:
@@ -25,7 +24,6 @@ def get_all_song():
 @users.route("/user/album", methods=["get"])
 def get_all_album():
     all_album = Album.query.all()
-    print(all_album)
     return render_template("player.html", album=all_album, a="s")
 
 
@@ -33,28 +31,25 @@ def get_all_album():
 def get_song_detail():
     data = request.form
     detail_song = Song.query.filter_by(_Song__id=data["id"]).first()
-    print(detail_song)
     return render_template("player.html", detail=detail_song)
 
 
 @users.route("/user/addsong", methods=["post"])
 def add_song():
-    print(request.form)
-    data = change_to_default(request.form)
-    print(data)
+    data = change_to_default(request.form)  # if '' return none
     img = get_info.get_song_cover(data["artist"], data["name"])
     year = get_info.get_song_date(data["artist"], data["name"])
     lyrics = get_info.get_lyrics(data["artist"], data["name"])
-    belongs_to = Album.query.filter_by(
-        name=data["album"]).filter_by(author=data["artist"]).first()
-    if belongs_to:
-        song = Song(url=data["Song_link"], img=img, alb_img=belongs_to.cover_img,
-                    name=data["name"], author=data["artist"], album_id=belongs_to._Album__id, album=belongs_to.name, duration=data["duration"], lyrics=lyrics, year=year)
-        add_song_function(song)
-    else:
-        song = Song(url=data["Song_link"], img=img, alb_img=None,
-                    name=data["name"], author=data["artist"], album_id=None, album=None, duration=data["duration"], lyrics=lyrics, year=year)
-        add_song_function(song)
+    # belongs_to = Album.query.filter_by(
+    #     name=data["album"]).filter_by(author=data["artist"]).first()
+    # if belongs_to:
+    #     song = Song(url=data["Song_link"], img=img, alb_img=belongs_to.cover_img,
+    #                 name=data["name"], author=data["artist"], album_id=belongs_to._Album__id, album=belongs_to.name, duration=data["duration"], lyrics=lyrics, year=year)
+    #     add_song_function(song)
+    # else:
+    song = Song(url=data["Song_link"], img=img, name=data["name"], author=data["artist"],
+                album=data["album"], duration=data["duration"], lyrics=lyrics, year=year)
+    add_song_function(song)
     return redirect(url_for("users.get_all_song"))
 
 
@@ -110,12 +105,26 @@ def delete_song():
     return redirect(url_for("users.get_all_song"))
 
 
-@users.route("/user/all_song_in_album", methods=['post'])
+@users.route("/user/song_in_album", methods=['post'])
 def song_in_album():
     album_id = request.form["id"]
-    song_in_album = db.session.query(Song).filter_by(album_id=album_id).all()
-    print(song_in_album.__len__())
-    return render_template("player.html", song=song_in_album)
+    alb = db.session.query(Album).filter_by(_Album__id=album_id).first()
+    return render_template("player.html", song=alb.Song_list, add_song_to_album=album_id)
+
+
+@users.route("/user/add_song_in_album", methods=['post'])
+def add_in_album():
+    album_id = request.form["album_id"]
+    artist = request.form["artist"]
+    song = request.form["name"]
+    alb = db.session.query(Album).filter_by(_Album__id=album_id).first()
+    song_in_album = db.session.query(
+        Song).filter_by(name=song, author=artist).first()
+    alb.Song_list.append(song_in_album)
+    db.session.commit()
+    alb = db.session.query(Album).filter_by(_Album__id=album_id).first()
+
+    return render_template("player.html", song=alb.Song_list, add_song_to_album=album_id)
 
 
 @users.route("/user/delete_album", methods=['post'])

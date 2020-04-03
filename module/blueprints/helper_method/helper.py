@@ -31,14 +31,16 @@ class get_info:
             return None
 
     def get_date(self, artist, album):
-        # try:
-        Album = pylast.Album(artist, album, self.network)
-        print(Album.__dir__())
-        data = Album.get_wiki_published_date()
-        print("date:  ", data)
-        return data
-        # except pylast.WSError:
-        #     return None
+        try:
+            Album = pylast.Album(artist, album, self.network)
+            print(Album.__dir__())
+            data = Album.get_wiki_published_date()
+            print("date:  ", data)
+            return data
+        except pylast.WSError:
+            return None
+        except IndexError:
+            return None
 
     # track
 
