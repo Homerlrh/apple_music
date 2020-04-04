@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<link
+			rel="stylesheet"
+			href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+			integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
+			crossorigin="anonymous"
+		/>
+		<link
+			rel="stylesheet"
+			href="{{ url_for('static',filename='css/list_container.css') }}"
+		/>
+		<link
+			rel="stylesheet"
+			href="{{ url_for('static',filename='css/flip.css') }}"
+		/>
+		<title>User page</title>
+	</head>
+	<body class="bg-dark text-white">
+		<header>{% include './partial/header.html' %}</header>
+		<main class="d-flex flex-column container" style="text-align: center;">
+			{% if user%}
+			<h1>{{user.name}}</h1>
+			{%endif%}
+			<seciton id="all_playlist container" style="text-align: left;">
+				{% if user.p_list%}{% for x in user.p_list%}
+				<div class="rounded text-dark">
+					<div class="flip-card" style="margin: auto;">
+						<div class="flip-card-inner">
+							<div class="flip-card-front">
+								<img
+									src="{{cover_img}}"
+									alt="Avatar"
+									style="width: 300px; height: 300px;"
+								/>
+							</div>
+							<div class="flip-card-back">
+								<h3 class="song_name" url="{{x.url}}" style="cursor: pointer;">
+									{{ x.name }}
+								</h3>
+								<p>creator: {{x.create_user}}</p>
+								<div
+									class="d-flex justify-content-between"
+									style="width: 30%; margin: 0 auto;"
+								>
+									<form
+										class="detail_form"
+										action="/user/music_detail"
+										method="POST"
+									>
+										<input
+											name="id"
+											value="{{x._playlist__id}}"
+											type="hidden"
+										/>
+										<input
+											type="image"
+											src="https://i.ibb.co/XVTw4nh/edit.png"
+											value="Edit detail"
+											class="img_btn"
+										/>
+									</form>
+									<form
+										class="detail_form"
+										action="/user/music_delete"
+										method="POST"
+									>
+										<input
+											name="id"
+											value="{{x._playlist__id}}"
+											type="hidden"
+										/>
+										<input
+											type="image"
+											src="https://i.ibb.co/LzkKdBM/delete.png"
+											value="Delete song"
+											class="img_btn"
+										/>
+									</form>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				{% endfor %} {%endif%}
+			</seciton>
+		</main>
+	</body>
+	{% include './partial/jq.html' %}
+</html>

@@ -2,16 +2,31 @@ from flask import Blueprint, render_template, request, url_for, redirect, curren
 from .. import db
 from ..Src.album import Album
 from ..Src.song import Song
+from ..Src.playlist import Playlist
+from ..Src.user import user
 from .helper_method.helper import get_info
 import boto3
 import pylast
 import os
+from .helper_method.helper import add_song_function, change_to_default, allow_file
 from mutagen.mp3 import MP3
 
 users = Blueprint("users", __name__)
 get_info = get_info()
 
 
+@users.route("/user/select_form", methods=["post"])
+def Body_change():
+    data = request.form
+    if data["options"] == "Song":
+        return redirect(url_for("users.get_all_song"))
+    elif data['options'] == "Album":
+        return redirect(url_for("users.get_all_album"))
+    else:
+        return redirect(url_for("users.playlist"))
+
+
+# info getter
 @users.route("/user/Song", methods=["get"])
 def get_all_song():
     all_song = Song.query.all()
@@ -34,6 +49,30 @@ def get_song_detail():
     return render_template("player.html", detail=detail_song)
 
 
+@users.route("/user/playlist", methods=["GET"])
+def playlist():
+    all_Playlist = Playlist.query.filter_by(access=True).all()
+    print(all_Playlist)
+    return render_template("player.html", Playlist=all_Playlist, p="sl")
+
+
+@users.route("/user/song_in_album", methods=['post'])
+def song_in_album():
+    album_id = request.form["id"]
+    alb = db.session.query(Album).filter_by(_Album__id=album_id).first()
+    return render_template("player.html", song=alb.Song_list, add_song_to_album=album_id)
+
+
+@users.route("/user/info", methods=['GET'])
+def user_info_page():
+    user_id = int(request.cookies.get("current_user"))
+    get_user = db.session.query(user).filter_by(_user__id=user_id).first()
+    print(get_user)
+    return render_template("user_info.html", user=get_user)
+
+# user control
+
+
 @users.route("/user/addsong", methods=["post"])
 def add_song():
     data = change_to_default(request.form)  # if '' return none
@@ -54,6 +93,21 @@ def add_song():
     return redirect(url_for("users.get_all_song"))
 
 
+@users.route("/user/updatesong", methods=["post"])
+def update_song():
+    data = request.form
+    is_album = db.session.query(Album).filter_by(name=data["Album"]).first()
+    stmt = {"name": data["name"],
+            "author": data["author"],
+            "genre": data["genre"],
+            "album": data["Album"],
+            "lyrics": data["lyrics"],
+            }
+    db.session.query(Song).filter_by(_Song__id=data["id"]).update(stmt)
+    db.session.commit()
+    return ("Song successfully update")
+
+
 @users.route("/user/addalbum", methods=["post"])
 def add_album():
     data = change_to_default(request.form)
@@ -70,36 +124,6 @@ def add_album():
     return redirect(url_for("users.get_all_album"))
 
 
-@users.route("/user/updatesong", methods=["post"])
-def update_song():
-    data = request.form
-    is_album = db.session.query(Album).filter_by(name=data["Album"]).first()
-    stmt = {"name": data["name"],
-            "author": data["author"],
-            "genre": data["genre"],
-            "album": data["Album"],
-            "lyrics": data["lyrics"],
-            }
-    db.session.query(Song).filter_by(_Song__id=data["id"]).update(stmt)
-    db.session.commit()
-    return ("Song successfully update")
-
-
-@users.route("/user/music_delete", methods=['post'])
-def delete_song():
-    data = request.form
-    db.session.query(Song).filter_by(_Song__id=data["id"]).delete()
-    db.session.commit()
-    return redirect(url_for("users.get_all_song"))
-
-
-@users.route("/user/song_in_album", methods=['post'])
-def song_in_album():
-    album_id = request.form["id"]
-    alb = db.session.query(Album).filter_by(_Album__id=album_id).first()
-    return render_template("player.html", song=alb.Song_list, add_song_to_album=album_id)
-
-
 @users.route("/user/add_song_in_album", methods=['post'])
 def add_in_album():
     album_id = request.form["album_id"]
@@ -113,21 +137,24 @@ def add_in_album():
     return render_template("player.html", song=alb.Song_list, add_song_to_album=album_id)
 
 
-@users.route("/user/delete_album", methods=['post'])
-def delete_album():
+@users.route("/user/addplaylist", methods=["Post"])
+def add_playlist():
     data = request.form
-    db.session.query(Album).filter_by(_Album__id=data["id"]).delete()
-    db.session.commit()
-    return redirect(url_for("users.get_all_album"))
-
-
-@users.route("/user/select_form", methods=["post"])
-def Body_change():
-    data = request.form
-    if data["options"] == "Song":
-        return redirect(url_for("users.get_all_song"))
+    user_id = int(request.cookies.get("current_user"))
+    get_user = db.session.query(user).filter_by(_user__id=user_id).first()
+    if data["access"] == "Public":
+        access = True
     else:
-        return redirect(url_for("users.get_all_album"))
+        access = False
+    print(access)
+    newlist = Playlist(
+        name=data['name'],
+        access=access,
+        create_user=get_user.name,
+        create_user_id=user_id
+    )
+    add_song_function(newlist)
+    return redirect(url_for("users.playlist"))
 
 
 @users.route("/user/song_upload", methods=["POST"])
@@ -148,30 +175,27 @@ def upload():
             return "Type is not supported, submit another one", 400
 
 
-def add_song_function(song):
-    db.session.add(song)
+# delete
+
+@users.route("/user/music_delete", methods=['post'])
+def delete_song():
+    data = request.form
+    db.session.query(Song).filter_by(_Song__id=data["id"]).delete()
     db.session.commit()
-    print("add success")
+    return redirect(url_for("users.get_all_song"))
 
 
-def change_to_default(dic):
-    dicw = {}
-    for k, v in dic.items():
-        if v == "":
-            dicw[k] = None
-        else:
-            dicw[k] = v
-    return dicw
+@users.route("/user/delete_album", methods=['post'])
+def delete_album():
+    data = request.form
+    db.session.query(Album).filter_by(_Album__id=data["id"]).delete()
+    db.session.commit()
+    return redirect(url_for("users.get_all_album"))
 
 
-def allow_file(filename):
-    Allow_list = ["MP3", "OGG", "WAV"]
-
-    if not "." in filename:
-        return False
-    ext = filename.rsplit(".", 1)[1]
-
-    if ext.upper() in Allow_list:
-        return True
-    else:
-        return False
+@users.route("/user/delete_playlist", methods=['post'])
+def delete_playlist():
+    data = request.form
+    db.session.query(playlist).filter_by(_playlist__id=data["id"]).delete()
+    db.session.commit()
+    return redirect(url_for("users.playlist"))

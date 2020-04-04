@@ -6,7 +6,7 @@ class Album(db.Model):
     __tablename__ = "album"
     __id = db.Column(db.Integer, primary_key=True)
     cover_img = db.Column(db.String(
-        999), default="https://icons.iconarchive.com/icons/papirus-team/papirus-mimetypes/512/unknown-icon.png", unique=False, nullable=True)
+        999), default="https://upload.wikimedia.org/wikipedia/commons/thumb/7/75/Vinyl_record.svg/1200px-Vinyl_record.svg.png", unique=False, nullable=True)
     name = db.Column(db.String(80), default="unknown",
                      unique=False, nullable=True)
     author = db.Column(db.String(80), default="unknown",

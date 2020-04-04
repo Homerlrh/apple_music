@@ -23,5 +23,5 @@ class Song(db.Model):
     year = db.Column(db.Integer, default=9999, unique=False, nullable=True)
     like = db.Column(db.Integer, default=0, unique=False, nullable=True)
 
-    def __repr__(self):
-        return '<song %r>' % self.__id
+    # def __repr__(self):
+    #     return '<song %r>' % self.__id

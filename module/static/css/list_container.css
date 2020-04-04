@@ -1,0 +1,13 @@
+.list_container {
+	border: 1px solid white;
+	box-sizing: border-box;
+	padding: 10px;
+	border-radius: 15px;
+	margin-top: 20px;
+}
+
+.innerbox {
+	border-top: 1px solid white;
+	box-sizing: border-box;
+	padding: 10px;
+}
