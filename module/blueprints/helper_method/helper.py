@@ -9,7 +9,7 @@ class get_info:
 
     def __init__(self):
         self.network = pylast.LastFMNetwork(api_key=os.getenv("API_KEY"), api_secret=os.getenv("API_SECRET"),
-                                            username=os.getenv("API_usename"), password_hash=pylast.md5(os.getenv("API_passwor")))
+                                            username=os.getenv("API_usename"), password_hash=pylast.md5(os.getenv("API_password_hash")))
 
     # get song
 
