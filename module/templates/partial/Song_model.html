@@ -1,115 +1,55 @@
-<button
-	type="button"
-	class="btn btn-primary"
-	data-toggle="modal"
-	data-target="#exampleModal"
->
+<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
 	Add song
 </button>
 
 <!-- Modal -->
-<div
-	class="modal fade"
-	id="exampleModal"
-	tabindex="-1"
-	role="dialog"
-	aria-labelledby="exampleModalLabel"
-	aria-hidden="true"
->
+<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+	aria-hidden="true">
 	<div class="modal-dialog" role="document" style="color: black;">
 		<div class="modal-content">
 			<div class="modal-header">
 				<h5 class="modal-title" id="exampleModalLabel">Add song</h5>
-				<button
-					type="button"
-					class="close"
-					data-dismiss="modal"
-					aria-label="Close"
-				>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
 					<span aria-hidden="true">&times;</span>
 				</button>
 			</div>
 			<div class="modal-body text-black of">
-				<span
-					>Upload song {{ dropzone.create(action='/user/song_upload') }}
+				<span>Upload song {{ dropzone.create(action='/user/song_upload') }}
 				</span>
 				<hr />
-				<form
-					id="add_song"
-					style="margin-top: 10px;"
-					method="POST"
-					action="/user/addsong"
-					enctype="multipart/form-data"
-				>
+				<form id="add_song" style="margin-top: 10px;" method="POST" action="/user/add"
+					enctype="multipart/form-data">
+					<div class="form-group" hidden>
+						<input type="text" class="form-control" name="type" value="Song" />
+					</div>
 					<div class="form-group">
 						<label for="">Name</label>
-						<input
-							type="text"
-							class="form-control"
-							name="name"
-							value=""
-							id="song_name"
-						/>
+						<input type="text" class="form-control" name="name" value="" id="song_name" />
 					</div>
 					<div class="form-group" hidden>
 						<label for="">Song link</label>
-						<input
-							type="url"
-							class="form-control"
-							name="Song_link"
-							id="song_src"
-							value=""
-						/>
+						<input type="url" class="form-control" name="Song_link" id="song_src" value="" />
 					</div>
 					<div class="form-group">
 						<label for="">Genre</label>
-						<input
-							type="text"
-							class="form-control"
-							name="genre"
-							id="genre"
-							value=""
-						/>
+						<input type="text" class="form-control" name="genre" id="genre" value="" />
 					</div>
 					<div class="form-group" hidden>
 						<label for="">Duration</label>
-						<input
-							type="text"
-							class="form-control"
-							name="duration"
-							id="duration"
-							value=""
-						/>
+						<input type="text" class="form-control" name="duration" id="duration" value="" />
 					</div>
 					<div class="form-group">
 						<label for="">Artist</label>
-						<input
-							type="text"
-							class="form-control"
-							name="artist"
-							value=""
-							id="artist"
-						/>
+						<input type="text" class="form-control" name="artist" value="" id="artist" />
 					</div>
 					<div class="form-group">
 						<label for="">Album</label>
-						<input
-							type="text"
-							class="form-control"
-							name="album"
-							value=""
-							id="album"
-						/>
+						<input type="text" class="form-control" name="album" value="" id="album" />
 					</div>
 					<div class="form-group" hidden>
 						<label for="">Lyrics</label>
-						<textarea
-							class="form-control"
-							name="lyrics"
-							id="lyric"
-							rows="10"
-							style="height: 500px;"
-						></textarea>
+						<textarea class="form-control" name="lyrics" id="lyric" rows="10"
+							style="height: 500px;"></textarea>
 					</div>
 				</form>
 			</div>

@@ -2,6 +2,7 @@ import os
 import pylast
 import math
 import lyricwikia
+from ... import db
 
 
 class get_info:
@@ -82,3 +83,32 @@ def sec_to_min(num):
         whoel_num = f"0{whoel_num}"
     time = f"{int(whole)}:{whoel_num}"
     return time.split(".")[0]
+
+
+def add_song_function(song):
+    db.session.add(song)
+    db.session.commit()
+    print("add success")
+
+
+def change_to_default(dic):
+    dicw = {}
+    for k, v in dic.items():
+        if v == "":
+            dicw[k] = None
+        else:
+            dicw[k] = v
+    return dicw
+
+
+def allow_file(filename):
+    Allow_list = ["MP3", "OGG", "WAV"]
+
+    if not "." in filename:
+        return False
+    ext = filename.rsplit(".", 1)[1]
+
+    if ext.upper() in Allow_list:
+        return True
+    else:
+        return False
