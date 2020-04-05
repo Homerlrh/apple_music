@@ -82,7 +82,8 @@ Default output format [text]:
 
 **Step2.** Go to line 244 in "user_route.py" in module > bluePrints
 
-And change line 254 "<your clounFront Domain name>"
+And change line 254 "your clounFront Domain name"
+
 ![code change](https://i.ibb.co/gmPYwP6/code-change.png)
 
 
