@@ -14,8 +14,9 @@
 				</button>
 			</div>
 			<div class="modal-body text-black of">
-				<form id="add_Album" style="margin-top: 10px;" method="POST" action="/user/add_song_in_album">
-					<input type="text" name="album_id" value="{{add_song_to_album}}" hidden />
+				<form id="add_Album" style="margin-top: 10px;" method="POST" action="/user/add_song_in">
+					<input type="text" class="form-control" name="type" value="Album" hidden />
+					<input type="text" name="r_id" value="{{add_song_to_album}}" hidden />
 					<div class="form-group">
 						<label for="">Name</label>
 						<input type="text" class="form-control" name="name" value="" />

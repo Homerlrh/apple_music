@@ -18,32 +18,28 @@
 
 		<div class="user_options-forms" id="user_options-forms">
 			<div class="user_forms-login">
+				{% if err%}
+				<div class="alert alert-danger" role="alert">
+					{{ err }}
+				</div>
+				{%elif ok%}
+				<div class="alert alert-success" role="alert">
+					{{ ok }}
+				</div>
+				{%endif%}
 				<h2 class="forms_title">Login</h2>
 
 				<form method="POST" action="/login" class="forms_form">
 					<fieldset class="forms_fieldset">
 						<div class="forms_field">
 							<label for="exampleInputEmail">Email:</label>
-							<input
-								name="email"
-								type="email"
-								id="exampleInputEmail1"
-								placeholder="Enter email"
-								class="forms_field-input"
-								required
-								autofocus
-							/>
+							<input name="email" type="email" id="exampleInputEmail1" placeholder="Enter email"
+								class="forms_field-input" required autofocus />
 						</div>
 						<div class="forms_field">
 							<label for="exampleInputPassword">Password:</label>
-							<input
-								name="password"
-								type="password"
-								id="exampleInputPassword"
-								placeholder="Enter password"
-								class="forms_field-input"
-								required
-							/>
+							<input name="password" type="password" id="exampleInputPassword"
+								placeholder="Enter password" class="forms_field-input" required />
 						</div>
 					</fieldset>
 					<div class="forms_buttons">
@@ -59,53 +55,29 @@
 				<form method="POST" action="/signup" class="forms_form">
 					<fieldset class="forms_fieldset regis">
 						<div class="forms_field">
+							<label for="nameInput">Name:</label>
+							<input class="forms_field-input" name="name" type="text" id="nameInput"
+								placeholder="example: Tom" required />
+						</div>
+						<div class="forms_field">
 							<label for="emailInput">Email:</label>
-							<input
-								class="forms_field-input"
-								name="email"
-								type="email"
-								id="emailInput"
-								placeholder="example: homerlee@gmail.com"
-								required
-							/>
+							<input class="forms_field-input" name="email" type="email" id="emailInput"
+								placeholder="example: Tom@gmail.com" required />
 						</div>
 
 						<div class="forms_field">
 							<label for="passwordInput">Set a password:</label>
-							<input
-								name="password"
-								type="text"
-								id="passwordInput"
-								class="forms_field-input"
-								placeholder="Enter your password"
-								pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,}"
+							<input name="password" type="password" id="passwordInput" class="forms_field-input"
+								placeholder="Enter your password" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,}"
 								title="at least one number and one uppercase and lowercase letter, and at least 6 or more characters"
-								required
-							/>
+								required />
 						</div>
 
 						<div class="forms_field">
 							<label for="confirmPasswordInput">Confirm Password</label>
-							<input
-								name="password_confirm"
-								type="password"
-								class="forms_field-input"
-								id="confirmPasswordInput"
-								placeholder="Re-enter your password here"
-								pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,}"
-								required
-							/>
-						</div>
-
-						<div class="forms_field">
-							<label for="phoneInput">Phone Number:</label>
-							<input
-								name="phone_number"
-								type="number"
-								id="phoneInput"
-								class="forms_field-input"
-								placeholder="example:123-456789"
-							/>
+							<input name="password_confirm" type="password" class="forms_field-input"
+								id="confirmPasswordInput" placeholder="Re-enter your password here"
+								pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,}" required />
 						</div>
 					</fieldset>
 					<div class="forms_buttons">

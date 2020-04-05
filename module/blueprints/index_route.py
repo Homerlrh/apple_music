@@ -11,7 +11,10 @@ main = Blueprint("main", __name__)
 def index():
     try:
         newuser = user(name="admin", email="123@123.123", password="123123")
+        newuser2 = user(name="admin2", email="1233@1233.1233",
+                        password="123123")
         db.session.add(newuser)
+        db.session.add(newuser2)
         db.session.commit()
         return render_template("login.html")
     except:
@@ -26,20 +29,30 @@ def login():
         is_user = db.session.query(user).filter_by(email=accound).first()
         if is_user:
             if is_user.password == password:
-                resp = make_response(redirect("/user/Song"))
+                resp = make_response(redirect("/user/"))
                 resp.set_cookie('current_user', str(is_user._user__id))
                 return resp
             else:
-                return "password does not match, try again"
-    except AttributeError:
+                return render_template("login.html", err="password does not match, try again")
+        else:
+            return render_template("login.html", err="user is not exist")
+    except:
         return "user is not exist"
 
 
 @main.route("/signup", methods=["post"])
 def signup():
-    data = request.form
-
-    return data
+    name = request.form['name']
+    email = request.form['email']
+    password = request.form['password']
+    password_confirm = request.form['password_confirm']
+    if password_confirm == password:
+        newuser = user(name=name, email=email, password=password)
+        db.session.add(newuser)
+        db.session.commit()
+        return render_template("login.html", ok="you can login now")
+    else:
+        return render_template("login.html", err="password does not match, try again")
 
 
 @main.route("/logout", methods=['GET'])

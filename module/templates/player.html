@@ -33,6 +33,10 @@
 
 				{% include './partial/playlist.html' %}
 
+				{%elif add_song_to_playlist%}
+
+				{% include './partial/add_to_playlist.html' %}
+
 				{%else%}
 
 				{% include './partial/Song_model.html' %}
@@ -41,7 +45,7 @@
 			</div>
 			<div class="col-sm-4 d-flex justify-content-center">
 				<form></form>
-				<form id="select_form" action="/user/select_form" method="POST" class="d-flex justify-content-center">
+				<form id="select_form" action="/user/panue" method="POST" class="d-flex justify-content-center">
 					<div class="btn-group btn-group-toggle">
 						<label class="btn btn-secondary">
 							<input type="radio" name="options" id="option1" value="Song" class="change" />
@@ -96,10 +100,10 @@
 
 		{%elif song%}
 		<h1>Song panel</h1>
-		<section class="music_container row" style="width: 85%; margin: 30px auto;">
+		<section class="music_container row" style="width: 85%; margin: 30px auto 130px auto;">
 			{% for x in song%}
 
-			<div class="col-sm-4" style="margin-top: 20px;">
+			<div class=" col-sm-4" style="margin-top: 20px;">
 				<div class="rounded text-dark">
 					<div class="flip-card" style="margin: auto;">
 						<div class="flip-card-inner">
@@ -118,7 +122,8 @@
 										<input type="image" src="https://i.ibb.co/XVTw4nh/edit.png" value="Edit detail"
 											class="img_btn" />
 									</form>
-									<form class="detail_form" action="/user/music_delete" method="POST">
+									<form class="detail_form" action="/user/delete" method="POST">
+										<input type="text" class="form-control" name="type" value="Song" hidden />
 										<input name="id" value="{{x._Song__id}}" type="hidden" />
 										<input type="image" src="https://i.ibb.co/LzkKdBM/delete.png"
 											value="Delete song" class="img_btn" />
@@ -134,7 +139,7 @@
 
 		{%elif album%}
 		<h1>Album panel</h1>
-		<section class="music_container row" style="width: 85%; margin: 30px auto;">
+		<section class="music_container row" style="width: 85%; margin: 30px auto 130px auto;">
 			{% for x in album%}
 			<div class="col-sm-4" style="margin-top: 20px;">
 				<div class="rounded text-dark">
@@ -151,13 +156,15 @@
 								<p>Genre: {{x.genre}}</p>
 								<p>Year:{{x.year}}</p>
 								<div class="d-flex justify-content-between" style="width: 30%; margin: 0 auto;">
-									<form class="detail_form" action="/user/song_in_album" method="POST">
+									<form class="detail_form" action="/user/song_in" method="POST">
+										<input type="text" class="form-control" name="type" value="Album" hidden />
 										<input name="id" value="{{x._Album__id}}" type="hidden" />
 										<input type="image" src="https://i.ibb.co/Vv4GxCG/1608430-20.png"
 											value="all song" class="img_btn" width="20px" />
 									</form>
 
-									<form class="detail_form" action="/user/delete_album" method="POST">
+									<form class="detail_form" action="/user/delete" method="POST">
+										<input type="text" class="form-control" name="type" value="Album" hidden />
 										<input name="id" value="{{x._Album__id}}" type="hidden" />
 										<input type="image" src="https://i.ibb.co/LzkKdBM/delete.png"
 											value="Delete album" class="img_btn" />
@@ -173,7 +180,7 @@
 
 		{%elif Playlist%}
 		<h1>Playlist panel</h1>
-		<section class="music_container row" style="width: 85%; margin: 30px auto;">
+		<section class="music_container row" style="width: 85%; margin: 30px auto 130px auto;">
 			{% for x in Playlist%}
 			<div class="col-sm-4" style="margin-top: 20px;">
 				<div class="rounded text-dark">
@@ -189,16 +196,25 @@
 								<p>Created by: {{x.create_user}}</p>
 								<p>Date: {{x.created_date}}</p>
 								<div class="d-flex justify-content-between" style="width: 30%; margin: 0 auto;">
-									<form class="detail_form" action="/user/song_in_Playlist" method="POST">
+									<form class="detail_form" action="/user/song_in" method="POST">
+										<input type="text" class="form-control" name="type" value="Playlist" hidden />
 										<input name="id" value="{{x._Playlist__id}}" type="hidden" />
 										<input type="image" src="https://i.ibb.co/Vv4GxCG/1608430-20.png"
 											value="all song" class="img_btn" width="20px" />
 									</form>
 
-									<form class="detail_form" action="/user/delete_playlist" method="POST">
+									<form class="detail_form" action="/user/delete" method="POST">
+										<input type="text" class="form-control" name="type" value="Playlist" hidden />
 										<input name="id" value="{{x._Playlist__id}}" type="hidden" />
 										<input type="image" src="https://i.ibb.co/LzkKdBM/delete.png"
 											value="Delete album" class="img_btn" />
+									</form>
+								</div>
+								<div>
+									<form class="detail_form" action="/user/add_playlist_to_user" method="POST">
+										<input name="id" value="{{x._Playlist__id}}" type="hidden" />
+										<input type="submit" class="btn btn-outline-dark"
+											value="add to my collection" />
 									</form>
 								</div>
 							</div>

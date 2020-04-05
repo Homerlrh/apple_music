@@ -15,20 +15,8 @@ users = Blueprint("users", __name__)
 get_info = get_info()
 
 
-@users.route("/user/select_form", methods=["post"])
-def Body_change():
-    data = request.form
-    if data["options"] == "Song":
-        return redirect(url_for("users.get_all_song"))
-    elif data['options'] == "Album":
-        return redirect(url_for("users.get_all_album"))
-    else:
-        return redirect(url_for("users.playlist"))
-
-
-# info getter
-@users.route("/user/Song", methods=["get"])
-def get_all_song():
+@users.route("/user/", methods=["get"])
+def get_all():
     all_song = Song.query.all()
     if(all_song):
         return render_template("player.html", song=all_song, s="a")
@@ -36,10 +24,28 @@ def get_all_song():
         return render_template("player.html")
 
 
-@users.route("/user/album", methods=["get"])
-def get_all_album():
-    all_album = Album.query.all()
-    return render_template("player.html", album=all_album, a="s")
+@users.route("/user/panue", methods=["get", "post"])
+def Body_change():
+    try:
+        options = request.form['options']
+    except:
+        options = request.args['add_type']
+    if options == "Song":
+        all_song = Song.query.all()
+        if(all_song):
+            return render_template("player.html", song=all_song, s="a")
+        else:
+            return render_template("player.html")
+    elif options == "Album":
+        all_album = Album.query.all()
+        return render_template("player.html", album=all_album, a="s")
+    else:
+        all_Playlist = Playlist.query.filter_by(access=True).all()
+        print(all_Playlist)
+        return render_template("player.html", Playlist=all_Playlist, p="sl")
+
+
+# info getter
 
 
 @users.route("/user/music_detail", methods=["post"])
@@ -49,54 +55,147 @@ def get_song_detail():
     return render_template("player.html", detail=detail_song)
 
 
-@users.route("/user/playlist", methods=["GET"])
-def playlist():
-    all_Playlist = Playlist.query.filter_by(access=True).all()
-    print(all_Playlist)
-    return render_template("player.html", Playlist=all_Playlist, p="sl")
-
-
-@users.route("/user/song_in_album", methods=['post'])
-def song_in_album():
-    album_id = request.form["id"]
-    alb = db.session.query(Album).filter_by(_Album__id=album_id).first()
-    return render_template("player.html", song=alb.Song_list, add_song_to_album=album_id)
+@users.route("/user/song_in", methods=['post'])
+def song_in():
+    request_ID = request.form["id"]
+    if request.form["type"] == "Album":
+        alb = db.session.query(Album).filter_by(_Album__id=request_ID).first()
+        return render_template("player.html", song=alb.Song_list, add_song_to_album=request_ID)
+    else:
+        p_l = db.session.query(Playlist).filter_by(
+            _Playlist__id=request_ID).first()
+        return render_template("player.html", song=p_l.Song_List, add_song_to_playlist=request_ID)
 
 
 @users.route("/user/info", methods=['GET'])
 def user_info_page():
     user_id = int(request.cookies.get("current_user"))
     get_user = db.session.query(user).filter_by(_user__id=user_id).first()
+    p_l = db.session.query(Playlist).filter_by(create_user_id=user_id).first()
     print(get_user)
-    return render_template("user_info.html", user=get_user)
+    return render_template("user_info.html", user=get_user, all_list=p_l)
 
 # user control
 
 
-@users.route("/user/addsong", methods=["post"])
-def add_song():
-    data = change_to_default(request.form)  # if '' return none
-    img = get_info.get_song_cover(data["artist"], data["name"])
-    year = get_info.get_song_date(data["artist"], data["name"])
-    lyrics = get_info.get_lyrics(data["artist"], data["name"])
-    song = Song(
-        url=data["Song_link"],
-        img=img,
-        name=data["name"],
-        author=data["artist"],
-        album=data["album"],
-        duration=data["duration"],
-        lyrics=lyrics,
-        year=year
-    )
-    add_song_function(song)
-    return redirect(url_for("users.get_all_song"))
+@users.route("/user/add", methods=["post"])
+def add():
+    """
+    - use request.form['typr'] to determine what to add to DB
+    - use if else to choose what to add
+    """
+    data = change_to_default(request.form)
+    # add song
+    if request.form['type'] == "Song":
+        img = get_info.get_song_cover(data["artist"], data["name"])
+        year = get_info.get_song_date(data["artist"], data["name"])
+        lyrics = get_info.get_lyrics(data["artist"], data["name"])
+        song = Song(
+            url=data["Song_link"],
+            img=img,
+            name=data["name"],
+            author=data["artist"],
+            album=data["album"],
+            duration=data["duration"],
+            lyrics=lyrics,
+            year=year
+        )
+        add_song_function(song)
+
+        return redirect(url_for("users.Body_change", add_type="Song"))
+
+    # add Album
+    elif request.form['type'] == "Album":
+        img_link = get_info.get_cover_art(data["artist"], data["name"])
+        date = get_info.get_date(data["artist"], data["name"])
+        style = get_info.get_style(data["artist"], data["name"])
+        if date != None:
+            date = date.split(",")[0]
+        if data["name"] == None:
+            data["name"] = "unknow"
+            img_link = None
+        add_song_function(Album(
+            cover_img=img_link, name=data["name"], author=data["artist"], genre=style, year=date))
+        return redirect(url_for("users.Body_change", add_type="Album"))
+
+    # add
+    elif request.form['type'] == "Playlist":
+        user_id = int(request.cookies.get("current_user"))
+        get_user = db.session.query(user).filter_by(_user__id=user_id).first()
+        if data["access"] == "Public":
+            access = True
+        else:
+            access = False
+        print(access)
+        newlist = Playlist(
+            name=data['name'],
+            access=access,
+            create_user=get_user.name,
+            create_user_id=user_id
+        )
+        add_song_function(newlist)
+        get_user.p_list.append(newlist)
+        db.session.commit()
+        return redirect(url_for("users.Body_change", add_type="Playlist"))
+    else:
+        user_id = int(request.cookies.get("current_user"))
+        get_user = db.session.query(user).filter_by(_user__id=user_id).first()
+        if data["access"] == "Public":
+            access = True
+        else:
+            access = False
+        print(access)
+        newlist = Playlist(
+            name=data['name'],
+            access=access,
+            create_user=get_user.name,
+            create_user_id=user_id
+        )
+        add_song_function(newlist)
+        get_user.p_list.append(newlist)
+        db.session.commit()
+        return redirect(url_for("users.user_info_page"))
+    return "Something goes wrong", 500
+
+
+@users.route("/user/add_song_in", methods=['post'])
+def add_in():
+    options = request.form['type']
+    r_id = request.form["r_id"]
+    song = request.form["name"]
+    artist = request.form["artist"]
+    if options == "Album":
+        alb = db.session.query(Album).filter_by(_Album__id=r_id).first()
+        song_in_album = db.session.query(
+            Song).filter_by(name=song, author=artist).first()
+        alb.Song_list.append(song_in_album)
+        db.session.commit()
+        return render_template("player.html", song=alb.Song_list, add_song_to_album=r_id)
+    else:
+        p_l = db.session.query(Playlist).filter_by(
+            _Playlist__id=r_id).first()
+        song_in_playlist = db.session.query(
+            Song).filter_by(name=song, author=artist).first()
+        p_l.Song_List.append(song_in_playlist)
+        db.session.commit()
+        return render_template("player.html", song=p_l.Song_List, add_song_to_playlist=r_id)
+    return "Something went wrong plz try again"
+
+
+@users.route("/user/add_playlist_to_user", methods=['post'])
+def add_to_my_list():
+    user_id = int(request.cookies.get("current_user"))
+    get_user = db.session.query(user).filter_by(_user__id=user_id).first()
+    current_list = db.session.query(Playlist).filter_by(
+        _Playlist__id=request.form["id"]).first()
+    get_user.p_list.append(current_list)
+    db.session.commit()
+    return redirect(url_for("users.user_info_page"))
 
 
 @users.route("/user/updatesong", methods=["post"])
 def update_song():
     data = request.form
-    is_album = db.session.query(Album).filter_by(name=data["Album"]).first()
     stmt = {"name": data["name"],
             "author": data["author"],
             "genre": data["genre"],
@@ -106,55 +205,6 @@ def update_song():
     db.session.query(Song).filter_by(_Song__id=data["id"]).update(stmt)
     db.session.commit()
     return ("Song successfully update")
-
-
-@users.route("/user/addalbum", methods=["post"])
-def add_album():
-    data = change_to_default(request.form)
-    img_link = get_info.get_cover_art(data["artist"], data["name"])
-    date = get_info.get_date(data["artist"], data["name"])
-    style = get_info.get_style(data["artist"], data["name"])
-    if date != None:
-        date = date.split(",")[0]
-    if data["name"] == None:
-        data["name"] = "unknow"
-        img_link = None
-    add_song_function(Album(
-        cover_img=img_link, name=data["name"], author=data["artist"], genre=style, year=date))
-    return redirect(url_for("users.get_all_album"))
-
-
-@users.route("/user/add_song_in_album", methods=['post'])
-def add_in_album():
-    album_id = request.form["album_id"]
-    artist = request.form["artist"]
-    song = request.form["name"]
-    alb = db.session.query(Album).filter_by(_Album__id=album_id).first()
-    song_in_album = db.session.query(
-        Song).filter_by(name=song, author=artist).first()
-    alb.Song_list.append(song_in_album)
-    db.session.commit()
-    return render_template("player.html", song=alb.Song_list, add_song_to_album=album_id)
-
-
-@users.route("/user/addplaylist", methods=["Post"])
-def add_playlist():
-    data = request.form
-    user_id = int(request.cookies.get("current_user"))
-    get_user = db.session.query(user).filter_by(_user__id=user_id).first()
-    if data["access"] == "Public":
-        access = True
-    else:
-        access = False
-    print(access)
-    newlist = Playlist(
-        name=data['name'],
-        access=access,
-        create_user=get_user.name,
-        create_user_id=user_id
-    )
-    add_song_function(newlist)
-    return redirect(url_for("users.playlist"))
 
 
 @users.route("/user/song_upload", methods=["POST"])
@@ -177,25 +227,36 @@ def upload():
 
 # delete
 
-@users.route("/user/music_delete", methods=['post'])
+@users.route("/user/delete", methods=['post'])
 def delete_song():
-    data = request.form
-    db.session.query(Song).filter_by(_Song__id=data["id"]).delete()
-    db.session.commit()
-    return redirect(url_for("users.get_all_song"))
-
-
-@users.route("/user/delete_album", methods=['post'])
-def delete_album():
-    data = request.form
-    db.session.query(Album).filter_by(_Album__id=data["id"]).delete()
-    db.session.commit()
-    return redirect(url_for("users.get_all_album"))
+    options = request.form['type']
+    if options == "Song":
+        db.session.query(Song).filter_by(_Song__id=request.form["id"]).delete()
+        db.session.commit()
+        return redirect(url_for("users.Body_change", add_type="Song"))
+    elif options == "Album":
+        db.session.query(Album).filter_by(
+            _Album__id=request.form["id"]).delete()
+        db.session.commit()
+        return redirect(url_for("users.Body_change", add_type="Album"))
+    elif options == "Playlist_user":
+        db.session.query(Playlist).filter_by(
+            _Playlist__id=request.form["id"]).delete()
+        db.session.commit()
+        return redirect(url_for("users.user_info_page"))
+    else:
+        db.session.query(Playlist).filter_by(
+            _Playlist__id=request.form["id"]).delete()
+        db.session.commit()
+        return redirect(url_for("users.Body_change", add_type="Playlist"))
 
 
 @users.route("/user/delete_playlist", methods=['post'])
-def delete_playlist():
-    data = request.form
-    db.session.query(playlist).filter_by(_playlist__id=data["id"]).delete()
+def remove_playlist():
+    p_l = db.session.query(Playlist).filter_by(
+        _Playlist__id=request.form["id"]).first()
+    user_id = int(request.cookies.get("current_user"))
+    get_user = db.session.query(user).filter_by(_user__id=user_id).first()
+    get_user.p_list.remove(p_l)
     db.session.commit()
-    return redirect(url_for("users.playlist"))
+    return redirect(url_for("users.user_info_page"))
