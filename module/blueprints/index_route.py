@@ -22,22 +22,6 @@ def index():
     except:
         return render_template("login.html")
 
-#  accound = request.form['email']
-#     password = request.form['password']
-#     try:
-#         is_user = db.session.query(user).filter_by(email=accound).first()
-#         if is_user:
-#             if is_user.password == password:
-#                 resp = make_response(redirect("/user/"))
-#                 resp.set_cookie('current_user', str(is_user._user__id))
-#                 return resp
-#             else:
-#                 return render_template("login.html", err="password does not match, try again")
-#         else:
-#             return render_template("login.html", err="user is not exist")
-#     except:
-#         return "user is not exist"
-
 
 @main.route("/login", methods=["post"])
 def login():
