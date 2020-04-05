@@ -15,7 +15,6 @@ db = SQLAlchemy()
 def create_app():
     load_dotenv()
     app = Flask(__name__, template_folder="templates")
-    app.config["SECRET_KEY"] = os.getenv("S_K")
     app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv("DB_uri")
     # app.config["IMG_UPLOAD"] = "module\static\img"
     db.init_app(app)

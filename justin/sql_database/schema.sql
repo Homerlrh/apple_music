@@ -8,17 +8,17 @@ DROP TABLE IF EXISTS artist_albums;
 DROP TABLE IF EXISTS albums;
 DROP TABLE IF EXISTS user_favorite_songs;
 DROP TABLE IF EXISTS song_user_likes;
-DROP TABLE IF EXISTS songs;
 DROP TABLE IF EXISTS artist_songs;
+DROP TABLE IF EXISTS songs;
 DROP TABLE IF EXISTS artists;
 DROP TABLE IF EXISTS users;
 
 CREATE TABLE users (
     _id           INTEGER PRIMARY KEY,
     email         TEXT NOT NULL,
-    password_hash    TEXT NOT NULL
+    password_hash    TEXT NOT NULL,
     `name`        TEXT NOT NULL,
-    date_of_birth TEXT NOT NULL,
+    date_of_birth TEXT NOT NULL
 );
 
 CREATE TABLE artists (
@@ -26,21 +26,21 @@ CREATE TABLE artists (
     `name`        TEXT NOT NULL
 );
 
---artists have many songs, and songs can be recorded by many artists
-CREATE TABLE artist_songs (
-    _id             INTEGER PRIMARY KEY,
-    artist_id       INTEGER,
-    song_id         INTEGER,
-    FOREIGN KEY (song_id) REFERENCES songs(_id)
-    FOREIGN KEY (artist_id) REFERENCES artists(_id)
-);
-
 CREATE TABLE songs (
     _id         INTEGER PRIMARY KEY,
     title       TEXT NOT NULL,
     artist_id   INTEGER,
     duration    REAL NOT NULL,
-    release_year TEXT NOT NULL,
+    release_year TEXT NOT NULL
+);
+
+--artists have many songs, and songs can be recorded by many artists
+CREATE TABLE artist_songs (
+    _id             INTEGER PRIMARY KEY,
+    artist_id       INTEGER,
+    song_id         INTEGER,
+    FOREIGN KEY (song_id) REFERENCES songs(_id),
+    FOREIGN KEY (artist_id) REFERENCES artists(_id)
 );
 
 CREATE TABLE song_user_likes (
