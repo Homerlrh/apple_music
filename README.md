@@ -91,7 +91,7 @@ And change line 254 "your clounFront Domain name"
 [Go to here](https://www.last.fm/api/)
 1. Create api account
 2. Get an api key
-3. modify the ".env" file
+3. modify the ".env" file, if there is no ".env" create one
 
 ![apiSetting](https://i.ibb.co/r7YJVNY/api-setting.png)
 
