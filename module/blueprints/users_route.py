@@ -1,15 +1,38 @@
-from flask import Blueprint, render_template, request, url_for, redirect, current_app
+from flask import Blueprint, render_template, request, url_for, redirect, current_app, jsonify
 from .. import db
 from ..Src.album import Album
 from ..Src.song import Song
+from ..Src.user import user
 import pylast
 import os
+import jwt
 from .helper_method.helper import get_info
 import boto3
+from functools import wraps
 
 users = Blueprint("users", __name__)
 get_info = get_info()
 
+
+def token_required(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        cookie = None
+        if 'user' in request.cookies:
+            cookie = request.cookies.get('user')
+
+        if not cookie:
+            return jsonify({'message' : 'cookie is missing!'}), 401
+
+        try:
+            data = jwt.decode(cookie,'thisissecret')
+            current_user = user.query.filter_by(email = data['user_email']).first()
+        except:
+            return jsonify({'message' : 'token is invalid!'})
+        
+        return f(current_user, *args, **kwargs)
+
+    return decorated
 
 @users.route("/user/Song", methods=["get"])
 def get_all_song():
@@ -22,14 +45,16 @@ def get_all_song():
 
 
 @users.route("/user/album", methods=["get"])
-def get_all_album():
+@token_required
+def get_all_album(current_user):
     all_album = Album.query.all()
     print(all_album)
     return render_template("player.html", album=all_album, a="s")
 
 
 @users.route("/user/music_detail", methods=["post"])
-def get_song_detail():
+@token_required
+def get_song_detail(current_user):
     data = request.form
     detail_song = Song.query.filter_by(_Song__id=data["id"]).first()
     print(detail_song)
@@ -37,7 +62,8 @@ def get_song_detail():
 
 
 @users.route("/user/addsong", methods=["post"])
-def add_song():
+@token_required
+def add_song(current_user):
     data = change_to_default(request.form)
     img = get_info.get_song_cover(data["artist"], data["name"])
     time = get_info.get_duration(data["artist"], data["name"])
@@ -55,7 +81,8 @@ def add_song():
 
 
 @users.route("/user/addalbum", methods=["post"])
-def add_album():
+@token_required
+def add_album(current_user):
     data = change_to_default(request.form)
     img_link = get_info.get_cover_art(data["artist"], data["name"])
     date = get_info.get_date(data["artist"], data["name"])
@@ -74,7 +101,8 @@ def add_album():
 
 
 @users.route("/user/updatesong", methods=["post"])
-def update_song():
+@token_required
+def update_song(current_user):
     data = request.form
     stmt = {"name": data["name"],
             "author": data["author"],
@@ -86,7 +114,8 @@ def update_song():
 
 
 @users.route("/user/music_delete", methods=['post'])
-def delete_song():
+@token_required
+def delete_song(current_user):
     data = request.form
     db.session.query(Song).filter_by(_Song__id=data["id"]).delete()
     db.session.commit()
@@ -94,14 +123,16 @@ def delete_song():
 
 
 @users.route("/user/all_song_in_album", methods=['post'])
-def song_in_album():
+@token_required
+def song_in_album(current_user):
     album_id = request.form["id"]
     song_in_album = db.session.query(Song).filter_by(album_id=album_id).all()
     return render_template("player.html", song=song_in_album)
 
 
 @users.route("/user/delete_album", methods=['post'])
-def delete_album():
+@token_required
+def delete_album(current_user):
     data = request.form
     db.session.query(Album).filter_by(_Album__id=data["id"]).delete()
     db.session.commit()
@@ -109,7 +140,8 @@ def delete_album():
 
 
 @users.route("/user/select_form", methods=["post"])
-def Body_change():
+@token_required
+def Body_change(current_user):
     data = request.form
     if data["options"] == "Song":
         return redirect(url_for("users.get_all_song"))
