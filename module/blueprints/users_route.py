@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, url_for, redirect, current_app
+from flask import Blueprint, render_template, request, url_for, redirect, current_app, jsonify
 from .. import db
 from ..Src.album import Album
 from ..Src.song import Song
@@ -10,13 +10,38 @@ import pylast
 import os
 from .helper_method.helper import add_song_function, change_to_default, allow_file
 from mutagen.mp3 import MP3
+import jwt
+from functools import wraps
 
 users = Blueprint("users", __name__)
 get_info = get_info()
 
 
+def token_required(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        cookie = None
+        if 'user' in request.cookies:
+            cookie = request.cookies.get('user')
+
+        if not cookie:
+            return jsonify({'message': 'cookie is missing!'}), 401
+
+        try:
+            data = jwt.decode(cookie, '***************')
+            current_user = user.query.filter_by(
+                email=data['user_email']).first()
+        except:
+            return jsonify({'message': 'token is invalid!'})
+
+        return f(current_user, *args, **kwargs)
+
+    return decorated
+
+
 @users.route("/user/", methods=["get"])
-def get_all():
+@token_required
+def get_all(current_user):
     all_song = Song.query.all()
     if(all_song):
         return render_template("player.html", song=all_song, s="a")
@@ -25,7 +50,8 @@ def get_all():
 
 
 @users.route("/user/panue", methods=["get", "post"])
-def Body_change():
+@token_required
+def Body_change(current_user):
     try:
         options = request.form['options']
     except:
@@ -49,14 +75,16 @@ def Body_change():
 
 
 @users.route("/user/music_detail", methods=["post"])
-def get_song_detail():
+@token_required
+def get_song_detail(current_user):
     data = request.form
     detail_song = Song.query.filter_by(_Song__id=data["id"]).first()
     return render_template("player.html", detail=detail_song)
 
 
 @users.route("/user/song_in", methods=['post'])
-def song_in():
+@token_required
+def song_in(current_user):
     request_ID = request.form["id"]
     if request.form["type"] == "Album":
         alb = db.session.query(Album).filter_by(_Album__id=request_ID).first()
@@ -68,8 +96,9 @@ def song_in():
 
 
 @users.route("/user/info", methods=['GET'])
-def user_info_page():
-    user_id = int(request.cookies.get("current_user"))
+@token_required
+def user_info_page(current_user):
+    user_id = current_user._user__id
     get_user = db.session.query(user).filter_by(_user__id=user_id).first()
     p_l = db.session.query(Playlist).filter_by(create_user_id=user_id).first()
     print(get_user)
@@ -79,12 +108,14 @@ def user_info_page():
 
 
 @users.route("/user/add", methods=["post"])
-def add():
+@token_required
+def add(current_user):
     """
     - use request.form['typr'] to determine what to add to DB
     - use if else to choose what to add
     """
     data = change_to_default(request.form)
+    user_id = current_user._user__id
     # add song
     if request.form['type'] == "Song":
         img = get_info.get_song_cover(data["artist"], data["name"])
@@ -120,7 +151,6 @@ def add():
 
     # add
     elif request.form['type'] == "Playlist":
-        user_id = int(request.cookies.get("current_user"))
         get_user = db.session.query(user).filter_by(_user__id=user_id).first()
         if data["access"] == "Public":
             access = True
@@ -138,7 +168,6 @@ def add():
         db.session.commit()
         return redirect(url_for("users.Body_change", add_type="Playlist"))
     else:
-        user_id = int(request.cookies.get("current_user"))
         get_user = db.session.query(user).filter_by(_user__id=user_id).first()
         if data["access"] == "Public":
             access = True
@@ -159,7 +188,8 @@ def add():
 
 
 @users.route("/user/add_song_in", methods=['post'])
-def add_in():
+@token_required
+def add_in(current_user):
     options = request.form['type']
     r_id = request.form["r_id"]
     song = request.form["name"]
@@ -183,8 +213,9 @@ def add_in():
 
 
 @users.route("/user/add_playlist_to_user", methods=['post'])
-def add_to_my_list():
-    user_id = int(request.cookies.get("current_user"))
+@token_required
+def add_to_my_list(current_user):
+    user_id = current_user._user__id
     get_user = db.session.query(user).filter_by(_user__id=user_id).first()
     current_list = db.session.query(Playlist).filter_by(
         _Playlist__id=request.form["id"]).first()
@@ -194,7 +225,8 @@ def add_to_my_list():
 
 
 @users.route("/user/updatesong", methods=["post"])
-def update_song():
+@token_required
+def update_song(current_user):
     data = request.form
     stmt = {"name": data["name"],
             "author": data["author"],
@@ -208,7 +240,8 @@ def update_song():
 
 
 @users.route("/user/song_upload", methods=["POST"])
-def upload():
+@token_required
+def upload(current_user):
     if request.files:
         f = request.files['file']
         if allow_file(f.filename):
@@ -228,7 +261,8 @@ def upload():
 # delete
 
 @users.route("/user/delete", methods=['post'])
-def delete_song():
+@token_required
+def delete_song(current_user):
     options = request.form['type']
     if options == "Song":
         db.session.query(Song).filter_by(_Song__id=request.form["id"]).delete()
@@ -252,10 +286,11 @@ def delete_song():
 
 
 @users.route("/user/delete_playlist", methods=['post'])
-def remove_playlist():
+@token_required
+def remove_playlist(current_user):
     p_l = db.session.query(Playlist).filter_by(
         _Playlist__id=request.form["id"]).first()
-    user_id = int(request.cookies.get("current_user"))
+    user_id = current_user._user__id
     get_user = db.session.query(user).filter_by(_user__id=user_id).first()
     get_user.p_list.remove(p_l)
     db.session.commit()

@@ -2,6 +2,8 @@ from flask import Blueprint, render_template, request, url_for, redirect, make_r
 from sqlalchemy.sql.expression import bindparam
 from .. import db
 from ..Src.user import user
+import jwt
+import datetime
 
 
 main = Blueprint("main", __name__)
@@ -20,24 +22,44 @@ def index():
     except:
         return render_template("login.html")
 
+#  accound = request.form['email']
+#     password = request.form['password']
+#     try:
+#         is_user = db.session.query(user).filter_by(email=accound).first()
+#         if is_user:
+#             if is_user.password == password:
+#                 resp = make_response(redirect("/user/"))
+#                 resp.set_cookie('current_user', str(is_user._user__id))
+#                 return resp
+#             else:
+#                 return render_template("login.html", err="password does not match, try again")
+#         else:
+#             return render_template("login.html", err="user is not exist")
+#     except:
+#         return "user is not exist"
+
 
 @main.route("/login", methods=["post"])
 def login():
-    accound = request.form['email']
-    password = request.form['password']
-    try:
-        is_user = db.session.query(user).filter_by(email=accound).first()
-        if is_user:
-            if is_user.password == password:
-                resp = make_response(redirect("/user/"))
-                resp.set_cookie('current_user', str(is_user._user__id))
-                return resp
-            else:
-                return render_template("login.html", err="password does not match, try again")
-        else:
-            return render_template("login.html", err="user is not exist")
-    except:
-        return "user is not exist"
+    login_user = request.form
+    print(login_user)
+    if not login_user or not login_user['email'] or not login_user['password']:
+        return make_response('Could not verify', 401, {'WWW-Authenticate': 'Basic realm = "Login Required!"'})
+    usr = user.query.filter_by(email=login_user['email']).first()
+
+    if not usr:
+        return make_response('Could not verify', 401, {'WWW-Authenticate': 'Basic realm = "Login Required!"'})
+
+    if usr.password == login_user['password']:
+        token = jwt.encode({'user_email': usr.email, 'exp': datetime.datetime.utcnow(
+        ) + datetime.timedelta(hours=24)}, '***************')
+        resp = make_response(redirect("/user/"))
+        resp.set_cookie('user', token)
+        return resp
+    else:
+        return render_template("login.html", err="password does not match, try again")
+
+    return make_response('Could not verify', 401, {'WWW-Authenticate': 'Basic realm = "Login Required!"'})
 
 
 @main.route("/signup", methods=["post"])
