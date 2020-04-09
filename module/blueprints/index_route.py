@@ -63,7 +63,7 @@ def signup():
 
 @main.route("/logout", methods=['GET'])
 def logout():
-    resp = make_response(redirect("/"))
-    user_id = request.cookies.get("current_user")
+    resp = make_response(render_template("login.html"))
+    user_id = request.cookies.get("user")
     resp.set_cookie('user', user_id, max_age=0)
     return resp
