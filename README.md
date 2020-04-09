@@ -4,6 +4,11 @@
 
 Allow user to post song to AWS s3 bucket and enable user to play music in the browser
 
+## What we user
+* Python flask
+* SQLite
+* S3 bucket
+
 # Get started
 
 **Create virtual environment**
@@ -105,3 +110,7 @@ on windows
 ```bash
 $ py main.py
 ```
+
+## What we did not implement yet
+* Artist panue
+* many to many realtionship in song and artist
