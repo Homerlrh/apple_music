@@ -16,3 +16,15 @@
 4. Task Name: setup the root folder structure 
 
 5. DB schema in Src 
+
+## Name of Team Member: Justin Yee
+### Tasks Worked On:
+
+1. OOP User Models
+    - models in SQLAlchemy format
+2. SQLite3 schema/database schema
+    - 13 table schema
+3. SQLite3 database-interface
+    - to interact directly with SQLite3 database without ORM
+3. Setup SQLAlchemy
+    - replicate SQLite3 schema over to SQLAlchemy syntax
