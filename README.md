@@ -111,6 +111,23 @@ on windows
 $ py main.py
 ```
 
-## What we did not implement yet
-* Artist panue
-* many to many realtionship in song and artist
+## Things to be Implemented
+<ul>
+  <li>Upgrade schema to use natural primary keys ie. International Standard Recording Code (ISRC)</li>
+  <li>Switch to full 13 table SQL database</li>
+  <ul>
+    <li>Updated Schema includes all many-many relationships</li>
+    <li>ie. playlist_songs, artist_songs</li>
+  </ul>
+  <li>Integrate authentication from Gurmeet's code to Master</li>
+  <li>Implement Authorisation status levels such that:</li>
+  <ul>
+    <li>Only database admins can upload songs/create albums etc. to the database</li>
+    <li>Users have read-only privileges, plus ability to create playlists</li>
+    <li>Free user restrictions / paid user access</li>
+  </ul>
+  <li>Upload full test environment with 100 songs to test</li>
+  <li>Create automated test suite with pytest and implement github actions for continuous integration</li>
+  <li>Centralized error handling</li>
+  <li>Write documentation</li>
+</ul>
