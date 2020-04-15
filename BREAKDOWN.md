@@ -28,3 +28,15 @@
     - to interact directly with SQLite3 database without ORM
 3. Setup SQLAlchemy
     - replicate SQLite3 schema over to SQLAlchemy syntax
+
+## Name of Team Member: Gurmeet Sandhu
+### Tasks Worked on:
+
+1. Authentication
+    - check for whether user is valid or not
+2. Creating JSON web token
+    - creates json web token and return it to the user
+3. Created a decorator to be applied to protected routes
+    - created @token_required decorator to be applied to the protected routes
+4. Sign up
+    - creates the user if user does not exist
